@@ -1,0 +1,21 @@
+---
+---
+<section class="section">
+  <div class="wrap grid gap-6 md:grid-cols-2">
+    <div class="rounded-3xl border-2 border-emerald-600/30 bg-emerald-50 p-7">
+      <h2 class="text-2xl">To jest dla Ciebie, jeśli</h2>
+      <ul class="mt-4 grid gap-3 text-ink">
+        <li class="tick">chcesz zamieszkać w ciągu miesięcy, a nie lat,</li>
+        <li class="tick">chcesz znać cenę przed startem i nie dopłacać w trakcie,</li>
+        <li class="tick">nie masz czasu pilnować ekip i urzędów,</li>
+        <li class="tick">wystarczy Ci dom do 105 m² powierzchni użytkowej.</li>
+      </ul>
+    </div>
+    <div class="rounded-3xl border-2 border-navy/10 bg-sand p-7">
+      <h2 class="text-2xl">Lepiej wybierz kogoś innego, jeśli</h2>
+      <ul class="mt-4 grid gap-3 text-ink">
+        {['chcesz domu większego niż 115 m² albo z indywidualnego projektu od zera,', 'planujesz budować etapami przez kilka lat, w miarę wolnych środków,', 'szukasz najniższej ceny za sam budynek, bez fundamentu i formalności,', 'chcesz samodzielnie prowadzić budowę i wybierać każdą ekipę.'].map((t) => <li class="flex gap-2.5"><span class="font-extrabold text-mute">✕</span>{t}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>

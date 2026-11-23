@@ -27,6 +27,10 @@ export const site = {
     short: '90 dni albo 1000 zł za każdy dzień opóźnienia',
     long: 'Dom oddajemy w 90 dni od skompletowania formalności. Za każdy dzień opóźnienia płacimy 1000 zł.',
   },
+  // AKTUALIZUJ RĘCZNIE: najbliższy miesiąc z wolnymi terminami realizacji. Musi być prawdziwy.
+  nextSlot: 'styczeń 2027',
+  // założenie do kalkulatora czynszu: typowa budowa tradycyjna vs nasz termin (w miesiącach)
+  traditionalMonths: 18, ourMonths: 5,
   priceFrom: 229635,
   vat: 0.08,
 };

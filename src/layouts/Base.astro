@@ -3,8 +3,8 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
-interface Props { title: string; description: string; bare?: boolean; noindex?: boolean; jsonld?: object[]; ogImage?: string; }
-const { title, description, bare = false, noindex = false, jsonld = [], ogImage } = Astro.props;
+interface Props { sticky?: string | false; title: string; description: string; bare?: boolean; noindex?: boolean; jsonld?: object[]; ogImage?: string; }
+const { sticky = '/wycena/', title, description, bare = false, noindex = false, jsonld = [], ogImage } = Astro.props;
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const gtm = import.meta.env.PUBLIC_GTM_ID;
 const org = {
@@ -56,7 +56,22 @@ const org = {
     <Header bare={bare} />
     <main id="tresc"><slot /></main>
     <Footer bare={bare} />
+    {sticky && (
+      <div data-sticky class="fixed inset-x-0 bottom-0 z-40 translate-y-full border-t border-navy/10 bg-white/95 p-3 shadow-[0_-8px_24px_rgba(11,22,42,.12)] backdrop-blur transition-transform duration-300 md:hidden">
+        <a href={sticky} class="btn-primary w-full !py-3">Sprawdź cenę swojego domu →</a>
+        <p class="mt-1.5 text-center text-[11px] font-semibold text-mute">7 pytań · cena od razu · wolne terminy: {site.nextSlot}</p>
+      </div>
+    )}
     <script>
+      // Przyklejony przycisk: pojawia się po przewinięciu pierwszego ekranu, znika, gdy quiz jest na ekranie.
+      const bar = document.querySelector<HTMLElement>('[data-sticky]');
+      if (bar) {
+        let quizVisible = false;
+        const quiz = document.querySelector('.quiz');
+        if (quiz) new IntersectionObserver((es) => { quizVisible = es[0].isIntersecting; upd(); }).observe(quiz);
+        const upd = () => bar.classList.toggle('translate-y-full', window.scrollY < 500 || quizVisible);
+        addEventListener('scroll', upd, { passive: true }); upd();
+      }
       // Wideo Vimeo ładowane dopiero po kliknięciu w miniaturę.
       document.addEventListener('click', (e) => {
         const b = (e.target as HTMLElement).closest<HTMLElement>('[data-vimeo]');

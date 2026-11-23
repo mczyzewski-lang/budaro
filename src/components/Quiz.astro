@@ -8,16 +8,15 @@ const { preselect = '', source = 'wycena' } = Astro.props;
 const data = models.map((m) => ({ slug: m.slug, name: fullName(m), priceFrom: m.priceFrom, tagline: m.tagline, usable: m.usable, rooms: m.rooms, permit: m.permit }));
 const consent = 'Zgadzam się na kontakt telefoniczny i e-mailowy ze strony AV Modules Sp. z o.o. (Budaro) w sprawie wyceny domu.';
 ---
-<section id="quiz" class="quiz mx-auto w-full max-w-2xl rounded-3xl border border-navy/10 bg-white p-5 shadow-xl sm:p-8" data-models={JSON.stringify(data)} data-vat={site.vat} data-preselect={preselect} data-source={source} data-consent={consent}>
+<section id="quiz" class="quiz mx-auto w-full max-w-2xl rounded-3xl border border-navy/10 bg-white p-5 shadow-xl sm:p-8" data-models={JSON.stringify(data)} data-vat={site.vat} data-preselect={preselect} data-source={source} data-consent={consent} data-slot={`Ostatnie wolne terminy: ${site.nextSlot}.`}>
   <div class="mb-6 flex items-center gap-3" data-progress-wrap>
     <button type="button" data-back class="hidden rounded-lg border border-navy/15 px-3 py-1.5 text-sm font-semibold text-navy hover:border-navy/40">← Wstecz</button>
     <div class="h-2 flex-1 overflow-hidden rounded-full bg-navy/10" role="progressbar" aria-label="Postęp" aria-valuemin="0" aria-valuemax="100"><div data-bar class="h-full w-0 rounded-full bg-ember transition-all"></div></div>
     <span data-count class="text-xs font-bold text-mute"></span>
   </div>
 
-  <div data-step="plot">
+  <div data-step="plot" hidden>
     <h2 class="text-2xl">Czy masz już działkę?</h2>
-    <p class="mt-1 text-mute">7 krótkich pytań. Na końcu zobaczysz cenę dopasowanego domu.</p>
     <div class="mt-5 grid gap-3">
       <button class="opt" data-v="yes">Tak, mam działkę</button>
       <button class="opt" data-v="buying">Jestem w trakcie zakupu</button>
@@ -35,9 +34,9 @@ const consent = 'Zgadzam się na kontakt telefoniczny i e-mailowy ze strony AV M
     </div>
   </div>
 
-  <div data-step="model" hidden>
-    <h2 class="text-2xl">Jaki dom Cię interesuje?</h2>
-    <p class="mt-1 text-mute">Ceny netto za pakiet Podstawowy, z fundamentem, transportem i montażem.</p>
+  <div data-step="model">
+    <h2 class="text-2xl">Który dom podoba Ci się najbardziej?</h2>
+    <p class="mt-1 text-mute">7 krótkich pytań, na końcu cena. Kwoty netto z fundamentem, transportem i montażem.</p>
     <div class="mt-5 grid gap-3 sm:grid-cols-2">
       {models.map((m) => (
         <button class="opt !p-0 overflow-hidden text-left" data-v={m.slug}>
@@ -88,6 +87,11 @@ const consent = 'Zgadzam się na kontakt telefoniczny i e-mailowy ze strony AV M
     <input id="q-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="np. 600 100 200" class="field mt-1.5" />
     <label class="mt-4 block text-sm font-bold text-navy" for="q-email">E-mail <span class="font-normal text-mute">(opcjonalnie, wyślemy kopię wyceny)</span></label>
     <input id="q-email" name="email" type="email" autocomplete="email" class="field mt-1.5" />
+    <fieldset class="mt-4"><legend class="text-sm font-bold text-navy">Kiedy najlepiej zadzwonić?</legend>
+      <div class="mt-1.5 grid grid-cols-2 gap-2 text-sm font-semibold text-navy">
+        {[['asap', 'Jak najszybciej'], ['9-12', 'Rano, 9–12'], ['12-16', 'Po południu, 12–16'], ['16-19', 'Wieczorem, 16–19']].map(([v, l], i) => <label class="flex cursor-pointer items-center gap-2 rounded-xl border-2 border-navy/15 px-3 py-2.5 has-[:checked]:border-ember has-[:checked]:bg-sun-100"><input type="radio" name="callback" value={v} checked={i === 0} class="accent-[#e8502f]" />{l}</label>)}
+      </div>
+    </fieldset>
     <input name="company_site" tabindex="-1" autocomplete="off" class="absolute -left-[9999px] h-0 w-0 opacity-0" aria-hidden="true" />
     <label class="mt-4 flex items-start gap-3 text-sm text-ink"><input type="checkbox" name="consent" class="mt-1 h-5 w-5 shrink-0 accent-[#e8502f]" /><span>{consent} <a href="/polityka-prywatnosci/" class="underline" target="_blank">Polityka prywatności</a>.</span></label>
     <p data-err class="mt-3 hidden text-sm font-semibold text-red-700" role="alert"></p>
@@ -125,11 +129,11 @@ const consent = 'Zgadzam się na kontakt telefoniczny i e-mailowy ze strony AV M
     const vat = Number(root.dataset.vat);
     const source = root.dataset.source!;
     const KEY = 'budaro_quiz_v2';
-    const order = ['plot', 'start', 'model', 'standard', 'finance', 'place', 'contact'];
+    const order = ['model', 'standard', 'plot', 'start', 'finance', 'place', 'contact'];
     let a: Record<string, string> = {};
     try { a = JSON.parse(sessionStorage.getItem(KEY) || '{}'); } catch {}
     if (root.dataset.preselect) a.model = root.dataset.preselect;
-    let cur = 'plot', started = false;
+    let cur = 'model', started = false;
     const $ = <T extends HTMLElement>(s: string, el: ParentNode = root) => el.querySelector<T>(s)!;
     const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
     const fmt = (n: number) => n.toLocaleString('pl-PL').replace(/ /g, ' ') + ' zł';
@@ -189,17 +193,17 @@ const consent = 'Zgadzam się na kontakt telefoniczny i e-mailowy ze strony AV M
       const res = await sendLead({
         formKey: 'quiz-v2', segment, hp: f.company_site.value, consentText: root!.dataset.consent!,
         contact: { first_name: name, phone, email: email || null, postal_code: a.postal || null, city: a.city || null },
-        answers: { hasPlot: a.plot, buildStart: a.start, model: a.model, package: a.standard, financing: a.finance, quiz_source: source, price_from_net: m?.priceFrom ?? null },
+        answers: { hasPlot: a.plot, buildStart: a.start, model: a.model, package: a.standard, financing: a.finance, callback_time: f.callback.value, quiz_source: source, price_from_net: m?.priceFrom ?? null },
       });
       btn.disabled = false; btn.textContent = 'Pokaż moją wycenę';
       if (!res.ok) return err(contact, res.reason === 'network' ? 'Nie udało się wysłać zgłoszenia. Sprawdź połączenie i spróbuj ponownie albo zadzwoń: +48 736 441 555.' : 'Zgłoszenie zostało odrzucone. Zadzwoń do nas: +48 736 441 555.');
       trackLead(res.eventId, 'quiz-v2', segment, segment === 'hot' ? 100 : segment === 'warm' ? 30 : 5, res.demo);
       track('quiz_complete', { quiz_source: source, lead_segment: segment });
-      result(name, segment);
+      result(name, segment, f.callback.value);
       try { sessionStorage.removeItem(KEY); } catch {}
     });
 
-    function result(name: string, segment: string) {
+    function result(name: string, segment: string, cb = 'asap') {
       const m = models.find((x) => x.slug === a.model);
       const min = Math.min(...models.map((x) => x.priceFrom)), max = Math.max(...models.map((x) => x.priceFrom));
       const g = (n: number) => fmt(Math.round(n * (1 + vat)));
@@ -218,15 +222,16 @@ const consent = 'Zgadzam się na kontakt telefoniczny i e-mailowy ze strony AV M
         $('[data-r-next]').textContent = 'Nie każda działka nadaje się pod dom na zgłoszenie. Pobierz checklistę i sprawdź ją przed zakupem. Możemy też bezpłatnie ocenić konkretną ofertę.';
         cta.innerHTML = link('/materialy/checklista-dzialki/', 'Pobierz checklistę działki', 'btn-primary') + link(m ? `/domy/${m.slug}/` : '/domy/', 'Zobacz projekt', 'btn-ghost');
       } else {
-        $('[data-r-next-title]').textContent = 'Co dalej?';
-        $('[data-r-next]').textContent = 'Doradca zadzwoni w ciągu jednego dnia roboczego, potwierdzi zakres i poda termin realizacji. Jeśli wolisz nie czekać, zadzwoń teraz.';
+        $('[data-r-next-title]').textContent = 'Zarezerwuj termin realizacji';
+        const when: Record<string, string> = { asap: 'najszybciej, jak to możliwe, najpóźniej w ciągu jednego dnia roboczego', '9-12': 'w najbliższy dzień roboczy między 9 a 12', '12-16': 'w najbliższy dzień roboczy między 12 a 16', '16-19': 'w najbliższy dzień roboczy między 16 a 19' };
+        $('[data-r-next]').textContent = `Doradca zadzwoni ${when[cb]}, potwierdzi zakres i zarezerwuje termin. ${root!.dataset.slot} Jeśli wolisz nie czekać, zadzwoń teraz.`;
         cta.innerHTML = link('tel:+48736441555', 'Zadzwoń: 736 441 555', 'btn-primary') + link(m ? `/domy/${m.slug}/` : '/domy/', 'Zobacz projekt i rzuty', 'btn-ghost');
       }
       show('result');
     }
 
     // wznowienie po odświeżeniu: wracamy do pierwszego pytania bez odpowiedzi
-    const firstOpen = order.find((s) => (s === 'place' ? a.postal === undefined : s === 'contact' ? true : !a[s])) || 'plot';
+    const firstOpen = order.find((s) => (s === 'place' ? a.postal === undefined : s === 'contact' ? true : !a[s])) || 'model';
     if (a.postal) postal.value = a.postal;
     show(firstOpen, false);
   }

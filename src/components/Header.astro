@@ -10,6 +10,9 @@ const nav = [
 ];
 const path = Astro.url.pathname;
 ---
+<div class="bg-navy text-center text-xs font-semibold text-white sm:text-sm">
+  <a href={bare ? '#quiz' : '/wycena/'} class="block px-4 py-2 hover:underline"><span class="text-sun">Ostatnie wolne terminy realizacji: {site.nextSlot}.</span> Sprawdź cenę i zarezerwuj termin →</a>
+</div>
 <header class="sticky top-0 z-40 border-b border-navy/10 bg-white/95 backdrop-blur">
   <div class="wrap flex h-16 items-center justify-between gap-4">
     <a href={bare ? undefined : '/'} aria-label="Budaro — strona główna" class="shrink-0"><img src="/logo/logo-dark.svg" alt="Budaro" width="131" height="24" class="h-6 w-auto" /></a>

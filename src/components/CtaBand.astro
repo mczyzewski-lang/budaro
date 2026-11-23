@@ -1,6 +1,6 @@
 ---
 import { site } from '../data/site';
-const { title = 'Sprawdź, ile będzie kosztować Twój dom', text = '7 pytań, około minuty. Cenę zobaczysz od razu na ekranie.' } = Astro.props;
+const { title = 'Sprawdź, ile będzie kosztować Twój dom', text = `7 pytań, około minuty. Cenę zobaczysz od razu. Ostatnie wolne terminy realizacji: ${site.nextSlot}.` } = Astro.props;
 ---
 <section class="bg-sun">
   <div class="wrap flex flex-col items-start gap-6 py-12 lg:flex-row lg:items-center lg:justify-between">

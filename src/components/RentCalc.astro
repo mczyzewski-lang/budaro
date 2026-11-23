@@ -1,0 +1,34 @@
+---
+import { site } from '../data/site';
+const { href = '/wycena/' } = Astro.props;
+const diff = site.traditionalMonths - site.ourMonths;
+---
+<section class="section">
+  <div class="wrap grid items-center gap-10 lg:grid-cols-2">
+    <div>
+      <p class="eyebrow">Koszt czekania</p>
+      <h2 class="h2">Każdy miesiąc budowy to kolejny czynsz</h2>
+      <p class="lead">Budowa tradycyjna trwa zwykle 12–24 miesiące. U nas od podpisania umowy do kluczy mija około {site.ourMonths} miesięcy, razem z formalnościami. Przez tę różnicę ktoś płaci za wynajem. Sprawdź, ile to u Ciebie.</p>
+    </div>
+    <div class="rentcalc rounded-3xl border border-navy/10 bg-white p-6 shadow-xl sm:p-8" data-diff={diff}>
+      <label for="rent" class="text-sm font-bold text-navy">Ile płacisz miesięcznie za wynajem?</label>
+      <div class="mt-2 flex items-baseline gap-2"><output data-rent class="text-3xl font-extrabold text-navy">2 500 zł</output><span class="text-sm text-mute">miesięcznie</span></div>
+      <input id="rent" type="range" min="1000" max="6000" step="100" value="2500" class="mt-3 w-full accent-[#e8502f]" />
+      <div class="mt-6 rounded-2xl bg-sand p-5">
+        <p class="text-sm text-mute">Budowa krótsza o {diff} miesięcy to</p>
+        <p class="text-4xl font-extrabold text-ember"><output data-total>37 500 zł</output></p>
+        <p class="text-sm font-semibold text-navy">czynszu, którego nie zapłacisz</p>
+      </div>
+      <p class="mt-3 text-xs text-mute">Założenie: {site.traditionalMonths} miesięcy budowy tradycyjnej wobec {site.ourMonths} miesięcy u nas. Twoja sytuacja może być inna.</p>
+      <a href={href} class="btn-primary mt-5 w-full">Sprawdź cenę swojego domu →</a>
+    </div>
+  </div>
+</section>
+<script>
+  document.querySelectorAll<HTMLElement>('.rentcalc').forEach((box) => {
+    const r = box.querySelector<HTMLInputElement>('input')!, diff = Number(box.dataset.diff);
+    const fmt = (n: number) => n.toLocaleString('pl-PL').replace(/ /g, ' ') + ' zł';
+    const upd = () => { box.querySelector('[data-rent]')!.textContent = fmt(+r.value); box.querySelector('[data-total]')!.textContent = fmt(+r.value * diff); };
+    r.addEventListener('input', upd); upd();
+  });
+</script>

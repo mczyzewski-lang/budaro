@@ -1,5 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
+import OfferStack from '../../components/OfferStack.astro';
+import RentCalc from '../../components/RentCalc.astro';
+import NotFor from '../../components/NotFor.astro';
 import Hero from '../../components/Hero.astro';
 import ProofBar from '../../components/ProofBar.astro';
 import ModelsGrid from '../../components/ModelsGrid.astro';
@@ -10,7 +13,7 @@ import Faq from '../../components/Faq.astro';
 import { site, zl, brutto } from '../../data/site';
 ---
 <!-- Landing pod Google Ads: ruch z intencją. Kolejność: cena i termin → dowód → modele z cenami → quiz. -->
-<Base title={`Dom modułowy od ${zl(site.priceFrom)} w 90 dni | Budaro`} description="Całoroczny dom modułowy ze stałą ceną i gwarancją terminu. Sprawdź cenę w minutę." bare noindex>
+<Base title={`Dom modułowy od ${zl(site.priceFrom)} w 90 dni | Budaro`} description="Całoroczny dom modułowy ze stałą ceną i gwarancją terminu. Sprawdź cenę w minutę." bare noindex sticky="#quiz">
   <Hero eyebrow="Domy modułowe całoroczne · na zgłoszenie" title={`Dom modułowy od ${zl(site.priceFrom)} netto. Gotowy w ${site.guarantee.days} dni.`}
     lead={`${zl(brutto(site.priceFrom))} brutto z formalnościami, fundamentem, transportem i montażem. Jeśli spóźnimy się z terminem, płacimy ${site.guarantee.penalty} za każdy dzień.`} cta="Sprawdź cenę dla swojej działki" ctaHref="#quiz" />
   <ProofBar />
@@ -19,7 +22,10 @@ import { site, zl, brutto } from '../../data/site';
     <p class="lead max-w-2xl">Ceny netto za pakiet Podstawowy. Wszystkie domy stawiamy bez pozwolenia na budowę.</p>
     <div class="mt-8"><ModelsGrid /></div>
   </div></section>
+  <OfferStack href="#quiz" />
   <Guarantee />
+  <RentCalc href="#quiz" />
+  <NotFor />
   <section class="section"><div class="wrap"><h2 class="h2">Klienci o współpracy</h2><div class="mt-8"><VideoTestimonials limit={3} /></div></div></section>
   <section class="section bg-navy"><div class="wrap">
     <h2 class="text-center text-3xl !text-white sm:text-4xl">Sprawdź cenę swojego domu</h2>

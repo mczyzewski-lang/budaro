@@ -1,5 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import OfferStack from '../components/OfferStack.astro';
+import RentCalc from '../components/RentCalc.astro';
+import NotFor from '../components/NotFor.astro';
 import Hero from '../components/Hero.astro';
 import ProofBar from '../components/ProofBar.astro';
 import VideoTestimonials from '../components/VideoTestimonials.astro';
@@ -29,7 +32,9 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
     <a href="/realizacje/" class="mt-6 inline-block font-bold text-ember hover:underline">Wszystkie opinie i realizacje →</a>
   </div></section>
 
-  <section class="section bg-sand" id="domy"><div class="wrap">
+  <OfferStack />
+
+  <section class="section" id="domy"><div class="wrap">
     <p class="eyebrow">Projekty i ceny</p>
     <h2 class="h2">Pięć domów. Każdy z ceną.</h2>
     <p class="lead max-w-2xl">Ceny netto za pakiet Podstawowy: formalności, płyta fundamentowa, transport, montaż, dach, okna i elewacja. Wszystkie domy stawiamy na zgłoszenie, bez pozwolenia na budowę.</p>
@@ -37,12 +42,15 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
   </div></section>
 
   <Guarantee />
+  <RentCalc />
 
-  <section class="section"><div class="wrap">
+  <section class="section bg-sand"><div class="wrap">
     <p class="eyebrow">Porównanie</p>
     <h2 class="h2">Budaro a budowa tradycyjna</h2>
     <div class="mt-8"><Compare /></div>
   </div></section>
+
+  <NotFor />
 
   <section class="section bg-sand"><div class="wrap">
     <p class="eyebrow">Jak to działa</p>

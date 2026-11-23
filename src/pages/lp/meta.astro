@@ -1,5 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
+import OfferStack from '../../components/OfferStack.astro';
+import RentCalc from '../../components/RentCalc.astro';
+import NotFor from '../../components/NotFor.astro';
 import Hero from '../../components/Hero.astro';
 import ProofBar from '../../components/ProofBar.astro';
 import ModelsGrid from '../../components/ModelsGrid.astro';
@@ -16,7 +19,7 @@ import { Image } from 'astro:assets';
 import { img } from '../../data/img';
 ---
 <!-- Landing pod Meta Ads: zimny ruch. Kolejność: efekt i wideo → dowód → gwarancja → porównanie → modele → quiz. -->
-<Base title="Własny dom zamiast czynszu, w 90 dni | Budaro" description="Całoroczny dom modułowy ze stałą ceną i gwarancją terminu. Zobacz opinie klientów i sprawdź cenę." bare noindex>
+<Base title="Własny dom zamiast czynszu, w 90 dni | Budaro" description="Całoroczny dom modułowy ze stałą ceną i gwarancją terminu. Zobacz opinie klientów i sprawdź cenę." bare noindex sticky="#quiz">
   <Hero eyebrow="Całoroczny dom z piętrem · bez pozwolenia na budowę" title={`Podpisujesz umowę. Po ${site.guarantee.days} dniach odbierasz klucze.`}
     lead={`Bez pilnowania ekip i bez dopłat w trakcie. Od ${zl(site.priceFrom)} netto z formalnościami, fundamentem i montażem. Za każdy dzień opóźnienia płacimy ${site.guarantee.penalty}.`} cta="Sprawdź, ile kosztuje Twój dom" ctaHref="#quiz">
     <button slot="media" type="button" data-vimeo={handoverVideoId} data-title="Odbiór domu u klientki" class="group relative block aspect-[4/3] w-full cursor-pointer overflow-hidden rounded-3xl bg-navy shadow-2xl" aria-label="Odtwórz film z odbioru domu">
@@ -26,7 +29,10 @@ import { img } from '../../data/img';
   </Hero>
   <ProofBar />
   <section class="section"><div class="wrap"><p class="eyebrow">Opinie klientów</p><h2 class="h2">Oni już mieszkają</h2><div class="mt-8"><VideoTestimonials /></div></div></section>
+  <OfferStack href="#quiz" />
   <Guarantee />
+  <RentCalc href="#quiz" />
+  <NotFor />
   <section class="section"><div class="wrap"><h2 class="h2">Budaro a budowa tradycyjna</h2><div class="mt-8"><Compare /></div></div></section>
   <section class="section bg-sand"><div class="wrap"><h2 class="h2">Pięć domów. Każdy z ceną.</h2><div class="mt-8"><ModelsGrid /></div></div></section>
   <section class="section"><div class="wrap"><h2 class="h2">Od decyzji do kluczy</h2><div class="mt-8"><Process /></div><div class="mt-10"><Gallery ids={[13, 9, 18, 26, 32, 42, 49, 3]} /></div></div></section>

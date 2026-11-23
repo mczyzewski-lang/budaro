@@ -1,8 +1,9 @@
 ---
-import { magnets } from '../data/magnets';
-interface Props { slug: keyof typeof magnets; compact?: boolean }
+import { magnets, type MagnetSlug } from '../data/magnets';
+interface Props { slug: string; compact?: boolean }
 const { slug, compact = false } = Astro.props;
-const m = magnets[slug];
+const m = magnets[slug as MagnetSlug];
+if (!m) throw new Error(`Nieznany lead magnet: ${slug}`);
 const consent = 'Zgadzam się na otrzymanie materiału i kontakt e-mailowy ze strony AV Modules Sp. z o.o. (Budaro) w sprawie domów modułowych.';
 ---
 <aside class:list={['magnet rounded-2xl border-2 border-sun bg-sun-100 p-6', compact ? '' : 'sm:p-8']} data-slug={slug} data-file={m.file} data-consent={consent}>

@@ -2,10 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import LeadMagnet from '../../components/LeadMagnet.astro';
 import PostCards from '../../components/PostCards.astro';
-import { magnets } from '../../data/magnets';
+import { magnets, type MagnetSlug } from '../../data/magnets';
 import { site } from '../../data/site';
 export function getStaticPaths() { return Object.keys(magnets).map((slug) => ({ params: { slug } })); }
-const slug = Astro.params.slug as keyof typeof magnets;
+const slug = Astro.params.slug as MagnetSlug;
 const m = magnets[slug];
 ---
 <Base title={`${m.title} (PDF) | Budaro`} description={m.pitch}>
@@ -20,5 +20,6 @@ const m = magnets[slug];
     </div>
     <LeadMagnet slug={slug} compact />
   </div></section>
+  <section class="section"><div class="wrap"><h2 class="text-2xl">Inne materiały z tego etapu</h2><ul class="mt-5 grid gap-3 md:grid-cols-2">{Object.entries(magnets).filter(([s, x]) => s !== slug && x.stage === m.stage).map(([s, x]) => <li><a href={`/materialy/${s}/`} class="card block !p-4 font-bold text-navy hover:border-ember">{x.title}</a></li>)}</ul><a href="/materialy/" class="mt-5 inline-block font-bold text-ember hover:underline">Wszystkie materiały →</a></div></section>
   <section class="section bg-sand"><div class="wrap"><h2 class="text-2xl">Przeczytaj też</h2><div class="mt-6"><PostCards limit={3} /></div></div></section>
 </Base>

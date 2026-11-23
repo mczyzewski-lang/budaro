@@ -5,11 +5,9 @@ import { cities } from '../data/cities';
 import { getCollection } from 'astro:content';
 const { bare = false } = Astro.props;
 const posts = (await getCollection('poradnik')).sort((a, b) => a.data.order - b.data.order);
-const magnets = [
-  { href: '/materialy/checklista-dzialki/', label: 'Checklista działki' },
-  { href: '/materialy/katalog-z-cenami/', label: 'Katalog domów z cenami' },
-  { href: '/materialy/formalnosci-krok-po-kroku/', label: 'Formalności krok po kroku' },
-];
+import { magnets as allMagnets } from '../data/magnets';
+const short: Record<string, string> = { 'checklista-dzialki': 'Checklista działki', 'przygotowanie-dzialki-do-montazu': 'Działka gotowa na montaż', 'katalog-z-cenami': 'Katalog domów z cenami', 'rzuty-domow': 'Rzuty wszystkich domów', 'pytania-do-wykonawcy': '15 pytań do wykonawcy', 'budzet-inwestycji': 'Budżet całej inwestycji', 'formalnosci-krok-po-kroku': 'Formalności krok po kroku', 'umowa-z-wykonawca': '10 zapisów w umowie', 'dokumenty-do-kredytu': 'Dokumenty do kredytu' };
+const magnets = Object.keys(allMagnets).map((s) => ({ href: `/materialy/${s}/`, label: short[s] ?? allMagnets[s as keyof typeof allMagnets].title }));
 ---
 <footer class="bg-navy text-white/80">
   {!bare && (

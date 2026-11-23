@@ -7,7 +7,7 @@ const poradnik = defineCollection({
   schema: z.object({
     title: z.string(), short: z.string(), description: z.string(), order: z.number(),
     updated: z.string(), readMin: z.number(), cover: z.string(),
-    magnet: z.enum(['checklista-dzialki', 'katalog-z-cenami', 'formalnosci-krok-po-kroku']),
+    magnet: z.string(),
     author: z.string().default('Łukasz Gruszkiewicz'),
   }),
 });

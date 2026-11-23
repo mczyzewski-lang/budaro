@@ -80,6 +80,7 @@ const org = {
         f.src = `https://player.vimeo.com/video/${b.dataset.vimeo}?autoplay=1&title=0&byline=0&portrait=0`;
         f.allow = 'autoplay; fullscreen; picture-in-picture'; f.allowFullscreen = true; f.title = b.dataset.title || 'Wideo';
         f.className = 'absolute inset-0 h-full w-full';
+        if (b.dataset.ratio) { b.style.aspectRatio = b.dataset.ratio; b.classList.remove('aspect-[4/5]'); }
         b.replaceChildren(f);
         (window as any).dataLayer?.push({ event: 'video_play', video_id: b.dataset.vimeo });
       });

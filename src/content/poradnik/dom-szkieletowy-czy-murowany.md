@@ -6,7 +6,7 @@ order: 4
 updated: "2026-11-23"
 readMin: 5
 cover: "img/4-postawienie-domu"
-magnet: "katalog-z-cenami"
+magnet: "pytania-do-wykonawcy"
 ---
 
 Budujemy domy w technologii szkieletu drewnianego, więc nie udajemy bezstronności. Zamiast tego pokazujemy, gdzie ta technologia wygrywa, a gdzie dom murowany ma przewagę.

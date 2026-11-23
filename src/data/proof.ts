@@ -1,11 +1,13 @@
 // Opinie wideo (Vimeo) i tekstowe — ze starej strony i obecnego landingu.
+// Nazwiska, modele i miejscowości zgodne z podpisami w samych filmach i tytułami na Vimeo.
+// `pos` = który fragment pionowego kadru pokazać na miniaturze (żeby nie ucinać twarzy).
 export const videoTestimonials = [
-  { id: '1156777134', name: 'Zbigniew Z.', region: 'woj. wielkopolskie', woj: 'wielkopolskie', quote: 'Budaro to partnerska firma, z którą warto rozpocząć współpracę.' },
-  { id: '1156777111', name: 'Jacek M.', region: 'woj. lubuskie', woj: 'lubuskie', quote: 'Dużo rzeczy było w cenie. Firmę Budaro poleciłbym na 5+. Czas zamieszkać!' },
-  { id: '1156776918', name: 'Arkadiusz K.', region: 'woj. opolskie', woj: 'opolskie', quote: 'Od podpisania umowy do momentu odbioru nic nas nie interesuje.' },
-  { id: '1156776996', name: 'Cezary S.', region: 'woj. dolnośląskie', woj: 'dolnośląskie', quote: 'Firma Budaro załatwiała wszystkie dokumenty i pozwolenia.' },
-  { id: '1156777024', name: 'Anna M.', region: '', woj: '', quote: 'Budaro zajęło się wszystkim. Niczym się nie martwiłam.' },
-  { id: '1156777050', name: 'Piotr L.', region: '', woj: '', quote: 'Budaro jest firmą godną polecenia.' },
+  { id: '1156777134', name: 'Zbigniew Ziółkowski', region: 'Modern Oasis · Potasze k. Poznania', woj: 'wielkopolskie', pos: '50% 22%', quote: 'Budaro to partnerska firma, z którą warto rozpocząć współpracę.' },
+  { id: '1156776918', name: 'Arkadiusz K.', region: 'Modern Heaven · Grodków k. Opola', woj: 'opolskie', pos: '50% 12%', quote: 'Od podpisania umowy do momentu odbioru nic nas nie interesuje.' },
+  { id: '1156776996', name: 'Cezary Słupski-Kartaczowski', region: 'Modern Heaven · woj. dolnośląskie', woj: 'dolnośląskie', pos: '50% 15%', quote: 'Firma Budaro załatwiała wszystkie dokumenty i pozwolenia.' },
+  { id: '1156777111', name: 'Jacek M.', region: 'Skwierzyna · woj. lubuskie', woj: 'lubuskie', pos: '50% 25%', quote: 'Dużo rzeczy było w cenie. Firmę Budaro poleciłbym na 5+. Czas zamieszkać!' },
+  { id: '1156777024', name: 'Diana', region: 'Modern Oasis · Drawsko Pomorskie', woj: 'zachodniopomorskie', pos: '50% 20%', quote: 'Budaro zajęło się wszystkim. Niczym się nie martwiłam.' },
+  { id: '1156777050', name: 'Diana', region: 'Modern Oasis · Drawsko Pomorskie, dom z lotu ptaka', woj: 'zachodniopomorskie', pos: '50% 45%', quote: 'Budaro jest firmą godną polecenia.' },
 ];
 export const handoverVideoId = '1156776944';
 

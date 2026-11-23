@@ -6,7 +6,7 @@ order: 2
 updated: "2026-11-23"
 readMin: 5
 cover: "img/process-contract"
-magnet: "katalog-z-cenami"
+magnet: "budzet-inwestycji"
 ---
 
 Na pytanie „ile kosztuje dom modułowy” większość firm odpowiada „to zależy”. My podajemy liczby, a potem tłumaczymy, od czego zależą.

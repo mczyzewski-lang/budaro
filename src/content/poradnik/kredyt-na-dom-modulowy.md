@@ -6,7 +6,7 @@ order: 5
 updated: "2026-11-23"
 readMin: 4
 cover: "img/process-keys"
-magnet: "formalnosci-krok-po-kroku"
+magnet: "dokumenty-do-kredytu"
 ---
 
 Krótka odpowiedź: tak, dom modułowy można sfinansować kredytem hipotecznym. Warunek jest jeden i dotyczy każdego domu: budynek musi być trwale związany z gruntem. Nasze domy stoją na płycie fundamentowej, więc go spełniają.

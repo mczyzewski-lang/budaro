@@ -6,7 +6,7 @@ order: 6
 updated: "2026-11-23"
 readMin: 4
 cover: "img/1-dobor-projektu"
-magnet: "formalnosci-krok-po-kroku"
+magnet: "przygotowanie-dzialki-do-montazu"
 ---
 
 „Dom w 3 dni” to prawda i nieprawda jednocześnie. Trzy dni trwa montaż na działce. Cała inwestycja, od pierwszej rozmowy do kluczy, to kilka miesięcy. Poniżej uczciwy rozkład.

@@ -1,0 +1,21 @@
+---
+import Base from '../../layouts/Base.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { cities, roadKmFromFactory } from '../../data/cities';
+const byWoj = Object.entries(Object.groupBy(cities, (c) => c.woj)).sort(([a], [b]) => a.localeCompare(b, 'pl'));
+---
+<Base title="Domy modułowe w Twoim mieście: lokalizacje | Budaro" description="Budujemy całoroczne domy modułowe w całej Polsce. Sprawdź swoje miasto: właściwy urząd, odległość od naszej hali i najbliższą realizację.">
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">Lokalizacje</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl">Domy modułowe w Twojej okolicy</h1>
+    <p class="lead max-w-2xl">Transport w całej Polsce jest w cenie. Dla każdego miasta podajemy urząd, w którym składa się zgłoszenie, i naszą najbliższą realizację.</p>
+    <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {byWoj.map(([woj, list]) => (
+        <div><h2 class="text-lg capitalize">{woj}</h2>
+          <ul class="mt-3 grid gap-2">{list!.map((c) => <li><a href={`/domy-modulowe/${c.slug}/`} class="flex items-center justify-between rounded-xl border border-navy/10 bg-white px-4 py-3 font-semibold text-navy hover:border-ember">Domy modułowe {c.name}<span class="text-xs font-normal text-mute">ok. {roadKmFromFactory(c)} km</span></a></li>)}</ul>
+        </div>
+      ))}
+    </div>
+  </div></section>
+  <CtaBand />
+</Base>

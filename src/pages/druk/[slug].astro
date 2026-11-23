@@ -1,0 +1,118 @@
+---
+// Wersje do druku: z nich powstają PDF-y lead magnetów (npm run pdf).
+import '../../styles/global.css';
+import { magnets } from '../../data/magnets';
+import { models, fullName, packages, facades } from '../../data/models';
+import { site, zl, brutto } from '../../data/site';
+import { Image } from 'astro:assets';
+import { img } from '../../data/img';
+export function getStaticPaths() { return Object.keys(magnets).map((slug) => ({ params: { slug } })); }
+const slug = Astro.params.slug as keyof typeof magnets;
+const m = magnets[slug];
+const checklist = [
+  ['Prawo i plan', [
+    ['Przeznaczenie w planie miejscowym', 'Wypis i wyrys z MPZP z urzędu gminy. Szukasz zabudowy mieszkaniowej jednorodzinnej (MN).'],
+    ['Warunki zabudowy, jeśli planu nie ma', 'O decyzję może wystąpić każdy, także przed zakupem.'],
+    ['Zapisy o bryle budynku', 'Wysokość, liczba kondygnacji, kąt i kolor dachu, linia zabudowy.'],
+    ['Klasa gruntu', 'Wypis z rejestru gruntów. Klasy I–III poza planem są w praktyce wyłączone z zabudowy.'],
+    ['Księga wieczysta', 'Właściciel, hipoteki, służebności przejazdu i przesyłu.'],
+  ]],
+  ['Dojazd i media', [
+    ['Dostęp do drogi publicznej', 'Bezpośredni, przez udział w drodze wewnętrznej albo służebność.'],
+    ['Dojazd dla ciężarówki i dźwigu', 'Szerokość drogi, zakręty, mostki, linie nad wjazdem, miejsce na dźwig.'],
+    ['Prąd', 'Odległość sieci od granicy. O warunki przyłączenia wystąp jak najwcześniej.'],
+    ['Woda i kanalizacja', 'Sieć, studnia, szambo albo przydomowa oczyszczalnia.'],
+  ]],
+  ['Teren', [
+    ['Grunt i woda', 'Podmokły teren, trzcina, rowy, torf, nasyp. Pewność dają badania geotechniczne.'],
+    ['Wymiary działki', '4 m od granicy dla ściany z oknami lub drzwiami, 3 m dla ściany bez otworów.'],
+    ['Ograniczenia', 'Strefa konserwatorska, obszar chroniony, teren zalewowy lub górniczy, pas pod linią energetyczną.'],
+  ]],
+] as const;
+const steps = [
+  ['Sprawdzenie działki', 'MPZP lub warunki zabudowy, klasa gruntu, dostęp do drogi.', 'Ty podajesz numer działki, my sprawdzamy.', '1–3 dni; warunki zabudowy osobno'],
+  ['Wybór projektu i umowa', 'Model, wariant układu, pakiet, cena i termin.', 'Wspólnie, jedno spotkanie.', '1 dzień'],
+  ['Mapa do celów projektowych', 'Zamawiana u geodety.', 'Budaro', '2–4 tygodnie'],
+  ['Badania geotechniczne', 'Podstawa do zaprojektowania płyty fundamentowej.', 'Budaro', 'ok. 1–2 tygodnie'],
+  ['Warunki przyłączenia mediów', 'Prąd, woda, kanalizacja.', 'Ty składasz wnioski, my podpowiadamy jak.', 'zależnie od operatora'],
+  ['Adaptacja projektu', 'Projekt zagospodarowania działki i projekt architektoniczno-budowlany.', 'Budaro, architekt', '2–3 tygodnie'],
+  ['Zgłoszenie budowy', 'Starostwo lub urząd miasta właściwy dla działki.', 'Budaro składa, Ty podpisujesz oświadczenia.', '1 dzień'],
+  ['Budowa', 'Płyta fundamentowa, montaż, instalacje, wykończenie.', 'Budaro', 'do 90 dni od kompletu formalności'],
+  ['Zakończenie budowy', 'Zawiadomienie w powiatowym inspektoracie nadzoru budowlanego.', 'Budaro przygotowuje dokumenty.', '1 dzień'],
+];
+const docs = ['Projekt zagospodarowania działki i projekt architektoniczno-budowlany', 'Oświadczenie o prawie do dysponowania nieruchomością na cele budowlane', 'Oświadczenie o budowie na własne potrzeby mieszkaniowe', 'Decyzja o warunkach zabudowy, jeśli działka nie ma planu miejscowego', 'Mapa do celów projektowych', 'Opinia geotechniczna', 'Pełnomocnictwo dla architekta, jeśli składa dokumenty w Twoim imieniu'];
+---
+<!doctype html>
+<html lang="pl">
+  <head><meta charset="utf-8" /><meta name="robots" content="noindex" /><title>{m.title} | Budaro</title>
+    <style is:global>
+      @page { size: A4; margin: 14mm; }
+      body { font-size: 11pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .page { break-after: page; } .page:last-child { break-after: auto; } .keep { break-inside: avoid; }
+    </style>
+  </head>
+  <body class="mx-auto max-w-[182mm] bg-white">
+    <header class="flex items-center justify-between border-b-4 border-sun pb-3"><img src="/logo/logo-dark.svg" alt="Budaro" class="h-6" /><p class="text-xs text-mute">{site.phone} · budaro.pl</p></header>
+
+    {slug === 'checklista-dzialki' && (
+      <div>
+        <h1 class="mt-5 text-3xl">12 rzeczy do sprawdzenia przed zakupem działki</h1>
+        <p class="mt-2 text-sm text-mute">Weź na oglądanie działki. Jeśli przy którymś punkcie nie możesz postawić znaczka, wyjaśnij go przed podpisaniem umowy przedwstępnej.</p>
+        {checklist.map(([group, items], gi) => (
+          <section class="keep mt-5"><h2 class="text-lg">{group}</h2>
+            <ul class="mt-2 grid gap-2">{items.map(([t, d], i) => <li class="flex gap-3 rounded-lg border border-navy/15 p-2.5"><span class="mt-0.5 h-5 w-5 shrink-0 rounded border-2 border-navy"></span><span><strong class="text-navy">{checklist.slice(0, gi).reduce((n, g) => n + g[1].length, 0) + i + 1}. {t}</strong><br /><span class="text-sm text-ink">{d}</span></span></li>)}</ul>
+          </section>
+        ))}
+        <section class="keep mt-5 rounded-xl bg-navy p-4 text-white"><p class="font-extrabold text-sun">Masz konkretną działkę na oku?</p><p class="mt-1 text-sm">Wyślij nam numer działki albo link do ogłoszenia. Sprawdzimy ją bezpłatnie przed zakupem: {site.phone}, {site.email}.</p></section>
+      </div>
+    )}
+
+    {slug === 'katalog-z-cenami' && (
+      <div>
+        <div class="page">
+          <h1 class="mt-6 text-4xl">Katalog domów Budaro z cenami</h1>
+          <p class="mt-2 text-mute">Całoroczne domy modułowe na zgłoszenie. Ceny z dnia {new Date().toLocaleDateString('pl-PL')}.</p>
+          <Image src={img('img/hero-house-reference')} alt="" width={900} class="mt-5 aspect-[16/9] w-full rounded-2xl object-cover" loading="eager" />
+          <table class="mt-6 w-full text-left text-sm"><thead><tr class="bg-navy text-white"><th class="p-2.5">Dom</th><th class="p-2.5">Pow. użytkowa</th><th class="p-2.5">Cena od, netto</th><th class="p-2.5">Brutto (8% VAT)</th></tr></thead>
+            <tbody>{models.map((x) => <tr class="border-b border-navy/10"><td class="p-2.5 font-bold text-navy">{fullName(x)}</td><td class="p-2.5">{x.usable}</td><td class="p-2.5 font-bold">{zl(x.priceFrom)}</td><td class="p-2.5">{zl(brutto(x.priceFrom))}</td></tr>)}</tbody></table>
+          <p class="mt-3 text-sm text-ink">Cena „od” to pakiet Podstawowy: formalności, płyta fundamentowa, transport w całej Polsce, montaż, dach, okna, drzwi wejściowe i elewacja z deski.</p>
+          <p class="mt-4 rounded-xl bg-sun-100 p-3 text-sm font-bold text-navy">Gwarancja terminu: {site.guarantee.long}</p>
+        </div>
+        {models.map((x) => (
+          <div class="page pt-5">
+            <h2 class="text-2xl">{fullName(x)}</h2><p class="font-semibold text-ember">{x.tagline}</p>
+            <Image src={img('modele/' + x.images[0])} alt="" width={900} class="mt-3 aspect-[16/8] w-full rounded-2xl object-cover" loading="eager" />
+            <p class="mt-3 text-sm text-ink">{x.desc} {x.forWhom}</p>
+            <div class="mt-3 grid grid-cols-2 gap-4">
+              <dl class="text-sm">{[['Powierzchnia zabudowy', x.footprint], ['Powierzchnia użytkowa', x.usable], ['Powierzchnia całkowita', x.total], ['Pomieszczenia', x.rooms], ['Wysokość', x.height], ['Kąt dachu', x.roof]].map(([k, v]) => <div class="flex justify-between border-b border-navy/10 py-1.5"><dt class="text-mute">{k}</dt><dd class="font-bold text-navy">{v}</dd></div>)}</dl>
+              <div class="rounded-xl bg-sand p-4"><p class="text-xs text-mute">Cena od, pakiet Podstawowy</p><p class="text-2xl font-extrabold text-navy">{zl(x.priceFrom)} netto</p><p class="text-sm text-mute">{zl(brutto(x.priceFrom))} brutto</p></div>
+            </div>
+            <div class="mt-3 grid grid-cols-2 gap-3">{x.plans.map((p) => <figure class="keep rounded-xl border border-navy/10 p-2"><Image src={img('rzuty/' + p.file)} alt="" width={600} class="max-h-[62mm] w-full object-contain" loading="eager" /><figcaption class="text-center text-xs font-bold text-navy">{p.label}</figcaption></figure>)}</div>
+          </div>
+        ))}
+        <div class="pt-5">
+          <h2 class="text-2xl">Pakiety wykonania</h2>
+          <div class="mt-3 grid grid-cols-3 gap-3">{packages.map((p) => <div class="rounded-xl border border-navy/15 p-3"><p class="font-extrabold text-navy">{p.name}</p><p class="text-xs text-mute">{p.short}</p><ul class="mt-2 grid gap-1 text-xs">{p.items.map((i) => <li class="tick">{i}</li>)}</ul></div>)}</div>
+          <h2 class="mt-6 text-2xl">Elewacja</h2>
+          <div class="mt-3 grid grid-cols-3 gap-3">{facades.map((f) => <div><Image src={img('img/' + f.img)} alt="" width={400} class="aspect-[2/1] w-full rounded-lg object-cover" loading="eager" /><p class="mt-1 text-sm font-bold text-navy">{f.name}</p><p class="text-xs text-mute">{f.desc}</p></div>)}</div>
+          <section class="mt-6 rounded-xl bg-navy p-4 text-white"><p class="font-extrabold text-sun">Chcesz dokładną wycenę dla swojej działki?</p><p class="mt-1 text-sm">budaro.pl/wycena albo telefon: {site.phone} ({site.advisor.name}).</p></section>
+        </div>
+      </div>
+    )}
+
+    {slug === 'formalnosci-krok-po-kroku' && (
+      <div>
+        <h1 class="mt-5 text-3xl">Formalności krok po kroku: dom na zgłoszenie do 70 m²</h1>
+        <p class="mt-2 text-sm text-mute">Kolejność działań, orientacyjny czas i podział zadań przy budowie z Budaro.</p>
+        <table class="mt-4 w-full text-left text-[9.5pt]"><thead><tr class="bg-navy text-white"><th class="p-2">Krok</th><th class="p-2">Co to jest</th><th class="p-2">Kto</th><th class="p-2">Czas</th></tr></thead>
+          <tbody>{steps.map(([a, b, c, d], i) => <tr class="keep border-b border-navy/10 align-top"><td class="p-2 font-bold text-navy">{i + 1}. {a}</td><td class="p-2">{b}</td><td class="p-2">{c}</td><td class="p-2 whitespace-nowrap">{d}</td></tr>)}</tbody></table>
+        <p class="mt-2 text-xs text-mute">Czasy orientacyjne, zależne od urzędu, geodety i operatorów sieci. Cały etap formalności trwa u nas średnio około 45 dni.</p>
+        <section class="keep mt-5"><h2 class="text-lg">Warunki uproszczonej ścieżki</h2><ul class="mt-2 grid gap-1 text-sm"><li class="tick">Wolnostojący budynek mieszkalny jednorodzinny</li><li class="tick">Do 70 m² powierzchni zabudowy, nie więcej niż dwie kondygnacje</li><li class="tick">Obszar oddziaływania w całości na Twojej działce</li><li class="tick">Budowa na własne potrzeby mieszkaniowe</li><li class="tick">Zgodność z planem miejscowym albo decyzja o warunkach zabudowy</li></ul></section>
+        <section class="keep mt-5"><h2 class="text-lg">Dokumenty do zgłoszenia</h2><ul class="mt-2 grid gap-1.5 text-sm">{docs.map((d) => <li class="flex gap-2.5"><span class="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-navy"></span>{d}</li>)}</ul></section>
+        <section class="keep mt-5 rounded-xl bg-sun-100 p-4"><p class="font-extrabold text-navy">Gdzie złożyć zgłoszenie?</p><p class="mt-1 text-sm">W starostwie powiatowym, a w mieście na prawach powiatu w urzędzie miasta. Decyduje położenie działki. Urzędy dla największych miast: budaro.pl/domy-modulowe</p></section>
+        <section class="keep mt-4 rounded-xl bg-navy p-4 text-white"><p class="font-extrabold text-sun">Wolisz, żebyśmy zrobili to za Ciebie?</p><p class="mt-1 text-sm">Formalności są w cenie każdego domu. {site.phone}, {site.email}.</p></section>
+        <p class="mt-4 text-[8pt] text-mute">Materiał informacyjny, stan na {new Date().toLocaleDateString('pl-PL')}. Nie stanowi porady prawnej.</p>
+      </div>
+    )}
+  </body>
+</html>

@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import ProofBar from '../components/ProofBar.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { team } from '../data/proof';
+import { site } from '../data/site';
+import { Image } from 'astro:assets';
+import { img } from '../data/img';
+---
+<Base title="O nas: ludzie, którzy zbudują Twój dom | Budaro" description="Budaro to firma z Wielkopolski. Projektujemy, produkujemy i stawiamy całoroczne domy modułowe w całej Polsce. Poznaj zespół.">
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">O nas</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl">Firma z Wielkopolski, domy w całej Polsce</h1>
+    <p class="lead max-w-3xl">Budaro to marka {site.legalName}, spółki działającej w grupie kapitałowej istniejącej od 2013 roku. Domy produkujemy we własnej hali w Gowarzewie pod Poznaniem i stawiamy na działkach klientów od Pomorza po Dolny Śląsk.</p>
+  </div></section>
+  <ProofBar />
+  <section class="section"><div class="wrap">
+    <h2 class="h2">Zespół</h2>
+    <p class="lead">Ludzie, z którymi będziesz rozmawiać i którzy postawią Twój dom.</p>
+    <ul class="mt-8 grid grid-cols-2 gap-5 md:grid-cols-3">
+      {team.map((t) => <li class="overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-sm"><Image src={img('team/' + t.file)} alt={t.name} widths={[300, 600]} sizes="(max-width: 768px) 50vw, 340px" class="aspect-[4/5] w-full object-cover object-top" /><div class="p-4"><p class="font-extrabold text-navy">{t.name}</p><p class="text-sm text-mute">{t.role}</p></div></li>)}
+    </ul>
+  </div></section>
+  <section class="section bg-sand"><div class="wrap grid gap-8 md:grid-cols-2">
+    <div><h2 class="text-2xl">Dane firmy</h2><address class="mt-4 not-italic text-ink">{site.legalName}<br />NIP: {site.nip}<br />{site.city}, {site.street}<br />{site.postal}, {site.region}</address></div>
+    <div><h2 class="text-2xl">Kontakt</h2><p class="mt-4 text-ink">{site.advisor.name}, {site.advisor.role}<br /><a class="font-bold text-ember" href={`tel:${site.phoneHref}`}>{site.phone}</a><br /><a class="underline" href={`mailto:${site.email}`}>{site.email}</a></p></div>
+  </div></section>
+  <CtaBand />
+</Base>

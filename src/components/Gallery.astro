@@ -1,0 +1,8 @@
+---
+import { Image } from 'astro:assets';
+import { img } from '../data/img';
+const { ids, alt = 'Realizacja domu modułowego Budaro' } = Astro.props;
+---
+<div class="columns-2 gap-3 sm:columns-3 lg:columns-4 [&>*]:mb-3">
+  {ids.map((n: number) => <Image src={img(`real/realizacja-${n}`)} alt={alt} widths={[300, 600]} sizes="(max-width: 640px) 50vw, 280px" class="w-full rounded-xl" loading="lazy" />)}
+</div>

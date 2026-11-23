@@ -1,0 +1,19 @@
+---
+const rows = [
+  ['Termin', '90 dni od kompletu formalności, zapisane w umowie', 'Zwykle 12–24 miesiące, zależne od pogody i ekip'],
+  ['Kara za opóźnienie', '1000 zł za każdy dzień', 'Najczęściej brak'],
+  ['Cena', 'Stała, znana przed podpisaniem umowy', 'Rośnie razem z cenami materiałów i robocizny'],
+  ['Formalności', 'Załatwiamy za Ciebie: projekt, zgłoszenie, geodeta, geologia', 'Po Twojej stronie'],
+  ['Wykonawca', 'Jedna firma i jedna umowa od fundamentu po odbiór', 'Kilka ekip, każda z własnym terminem'],
+  ['Budowa zimą', 'Tak, 95% prac odbywa się w hali', 'Przerwy na mróz i opady'],
+  ['Gwarancja konstrukcji', '25 lat', 'Zależnie od wykonawcy'],
+];
+---
+<div class="overflow-x-auto rounded-2xl border border-navy/10 bg-white shadow-sm">
+  <table class="w-full min-w-[640px] text-left text-sm">
+    <thead><tr class="bg-navy text-white"><th class="p-4 font-bold"></th><th class="p-4 font-extrabold text-sun">Budaro</th><th class="p-4 font-bold">Budowa tradycyjna z ekipami</th></tr></thead>
+    <tbody>
+      {rows.map(([k, a, b]) => <tr class="border-t border-navy/10"><th scope="row" class="p-4 font-bold text-navy">{k}</th><td class="bg-sun-100/50 p-4 font-semibold text-navy">{a}</td><td class="p-4 text-mute">{b}</td></tr>)}
+    </tbody>
+  </table>
+</div>

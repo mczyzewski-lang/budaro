@@ -1,0 +1,37 @@
+---
+import { site } from '../data/site';
+const { bare = false } = Astro.props;
+const nav = [
+  { href: '/domy/', label: 'Domy i ceny' },
+  { href: '/realizacje/', label: 'Realizacje' },
+  { href: '/jak-to-dziala/', label: 'Jak to działa' },
+  { href: '/poradnik/', label: 'Poradnik' },
+  { href: '/o-nas/', label: 'O nas' },
+];
+const path = Astro.url.pathname;
+---
+<header class="sticky top-0 z-40 border-b border-navy/10 bg-white/95 backdrop-blur">
+  <div class="wrap flex h-16 items-center justify-between gap-4">
+    <a href={bare ? undefined : '/'} aria-label="Budaro — strona główna" class="shrink-0"><img src="/logo/logo-dark.svg" alt="Budaro" width="131" height="24" class="h-6 w-auto" /></a>
+    {!bare && (
+      <nav class="hidden items-center gap-6 lg:flex" aria-label="Główna">
+        {nav.map((n) => <a href={n.href} class:list={['text-sm font-semibold hover:text-ember', path.startsWith(n.href) ? 'text-ember' : 'text-navy']}>{n.label}</a>)}
+      </nav>
+    )}
+    <div class="flex items-center gap-3">
+      <a href={`tel:${site.phoneHref}`} class="hidden text-sm font-bold text-navy sm:block">{site.phone}</a>
+      <a href="/wycena/" class="btn-primary !px-4 !py-2.5 !text-sm">Sprawdź cenę</a>
+      {!bare && (
+        <details class="relative lg:hidden">
+          <summary class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-navy/15" aria-label="Menu">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h14"/></svg>
+          </summary>
+          <nav class="absolute right-0 top-12 w-60 rounded-xl border border-navy/10 bg-white p-2 shadow-xl" aria-label="Mobilna">
+            {nav.map((n) => <a href={n.href} class="block rounded-lg px-4 py-3 font-semibold text-navy hover:bg-sand">{n.label}</a>)}
+            <a href={`tel:${site.phoneHref}`} class="block rounded-lg px-4 py-3 font-bold text-ember">{site.phone}</a>
+          </nav>
+        </details>
+      )}
+    </div>
+  </div>
+</header>

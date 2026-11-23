@@ -1,0 +1,233 @@
+---
+import { models, fullName, packages } from '../data/models';
+import { site, zl, brutto } from '../data/site';
+import { Image } from 'astro:assets';
+import { img } from '../data/img';
+interface Props { preselect?: string; source?: string }
+const { preselect = '', source = 'wycena' } = Astro.props;
+const data = models.map((m) => ({ slug: m.slug, name: fullName(m), priceFrom: m.priceFrom, tagline: m.tagline, usable: m.usable, rooms: m.rooms, permit: m.permit }));
+const consent = 'Zgadzam się na kontakt telefoniczny i e-mailowy ze strony AV Modules Sp. z o.o. (Budaro) w sprawie wyceny domu.';
+---
+<section id="quiz" class="quiz mx-auto w-full max-w-2xl rounded-3xl border border-navy/10 bg-white p-5 shadow-xl sm:p-8" data-models={JSON.stringify(data)} data-vat={site.vat} data-preselect={preselect} data-source={source} data-consent={consent}>
+  <div class="mb-6 flex items-center gap-3" data-progress-wrap>
+    <button type="button" data-back class="hidden rounded-lg border border-navy/15 px-3 py-1.5 text-sm font-semibold text-navy hover:border-navy/40">← Wstecz</button>
+    <div class="h-2 flex-1 overflow-hidden rounded-full bg-navy/10" role="progressbar" aria-label="Postęp" aria-valuemin="0" aria-valuemax="100"><div data-bar class="h-full w-0 rounded-full bg-ember transition-all"></div></div>
+    <span data-count class="text-xs font-bold text-mute"></span>
+  </div>
+
+  <div data-step="plot">
+    <h2 class="text-2xl">Czy masz już działkę?</h2>
+    <p class="mt-1 text-mute">7 krótkich pytań. Na końcu zobaczysz cenę dopasowanego domu.</p>
+    <div class="mt-5 grid gap-3">
+      <button class="opt" data-v="yes">Tak, mam działkę</button>
+      <button class="opt" data-v="buying">Jestem w trakcie zakupu</button>
+      <button class="opt" data-v="no">Jeszcze szukam</button>
+    </div>
+  </div>
+
+  <div data-step="start" hidden>
+    <h2 class="text-2xl">Kiedy chcesz zacząć budowę?</h2>
+    <div class="mt-5 grid gap-3">
+      <button class="opt" data-v="0-3">Jak najszybciej, w ciągu 3 miesięcy</button>
+      <button class="opt" data-v="3-6">Za 3–6 miesięcy</button>
+      <button class="opt" data-v="6-12">Za 6–12 miesięcy</button>
+      <button class="opt" data-v="later">Później albo jeszcze nie wiem</button>
+    </div>
+  </div>
+
+  <div data-step="model" hidden>
+    <h2 class="text-2xl">Jaki dom Cię interesuje?</h2>
+    <p class="mt-1 text-mute">Ceny netto za pakiet Podstawowy, z fundamentem, transportem i montażem.</p>
+    <div class="mt-5 grid gap-3 sm:grid-cols-2">
+      {models.map((m) => (
+        <button class="opt !p-0 overflow-hidden text-left" data-v={m.slug}>
+          <Image src={img('modele/' + m.images[0])} alt="" widths={[320, 640]} sizes="320px" class="h-28 w-full object-cover" />
+          <span class="block p-4"><span class="block font-extrabold">{fullName(m)}</span><span class="block text-sm font-normal text-mute">{m.usable} użytkowej · {m.type === 'antresola' ? 'z antresolą' : 'z piętrem'}</span><span class="mt-1 block text-sm font-bold text-ember">od {zl(m.priceFrom)} netto</span></span>
+        </button>
+      ))}
+      <button class="opt sm:col-span-2" data-v="unknown">Nie wiem, doradźcie mi</button>
+    </div>
+  </div>
+
+  <div data-step="standard" hidden>
+    <h2 class="text-2xl">W jakim standardzie?</h2>
+    <div class="mt-5 grid gap-3">
+      {packages.map((p) => <button class="opt text-left" data-v={p.key}><span class="block font-extrabold">{p.name}</span><span class="block text-sm font-normal text-mute">{p.short}</span></button>)}
+      <button class="opt" data-v="unknown">Jeszcze nie wiem</button>
+    </div>
+  </div>
+
+  <div data-step="finance" hidden>
+    <h2 class="text-2xl">Jak sfinansujesz budowę?</h2>
+    <div class="mt-5 grid gap-3">
+      <button class="opt" data-v="cash">Z własnych środków</button>
+      <button class="opt" data-v="credit-ready">Kredyt, mam już decyzję lub jestem w trakcie</button>
+      <button class="opt" data-v="credit-help">Kredyt, potrzebuję pomocy w jego uzyskaniu</button>
+      <button class="opt" data-v="unknown">Jeszcze nie wiem</button>
+    </div>
+  </div>
+
+  <form data-step="place" hidden novalidate>
+    <h2 class="text-2xl">Gdzie stanie dom?</h2>
+    <p class="mt-1 text-mute">Kod pocztowy działki pozwala nam policzyć transport i sprawdzić właściwy urząd.</p>
+    <label class="mt-5 block text-sm font-bold text-navy" for="q-postal">Kod pocztowy działki</label>
+    <input id="q-postal" name="postal" inputmode="numeric" autocomplete="postal-code" placeholder="np. 62-020" maxlength="6" class="field mt-1.5" />
+    <label class="mt-4 block text-sm font-bold text-navy" for="q-city">Miejscowość <span class="font-normal text-mute">(opcjonalnie)</span></label>
+    <input id="q-city" name="city" autocomplete="address-level2" placeholder="np. Swarzędz" class="field mt-1.5" />
+    <p data-err class="mt-3 hidden text-sm font-semibold text-red-700" role="alert"></p>
+    <button class="btn-primary mt-5 w-full">Dalej</button>
+    <button type="button" data-skip class="mt-3 w-full text-sm font-semibold text-mute underline">Nie znam jeszcze lokalizacji</button>
+  </form>
+
+  <form data-step="contact" hidden novalidate>
+    <h2 class="text-2xl">Gdzie wysłać wycenę?</h2>
+    <p class="mt-1 text-mute">Cenę zobaczysz od razu na następnym ekranie. Doradca zadzwoni, żeby potwierdzić zakres i termin.</p>
+    <label class="mt-5 block text-sm font-bold text-navy" for="q-name">Imię</label>
+    <input id="q-name" name="name" autocomplete="given-name" class="field mt-1.5" />
+    <label class="mt-4 block text-sm font-bold text-navy" for="q-phone">Telefon</label>
+    <input id="q-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="np. 600 100 200" class="field mt-1.5" />
+    <label class="mt-4 block text-sm font-bold text-navy" for="q-email">E-mail <span class="font-normal text-mute">(opcjonalnie, wyślemy kopię wyceny)</span></label>
+    <input id="q-email" name="email" type="email" autocomplete="email" class="field mt-1.5" />
+    <input name="company_site" tabindex="-1" autocomplete="off" class="absolute -left-[9999px] h-0 w-0 opacity-0" aria-hidden="true" />
+    <label class="mt-4 flex items-start gap-3 text-sm text-ink"><input type="checkbox" name="consent" class="mt-1 h-5 w-5 shrink-0 accent-[#e8502f]" /><span>{consent} <a href="/polityka-prywatnosci/" class="underline" target="_blank">Polityka prywatności</a>.</span></label>
+    <p data-err class="mt-3 hidden text-sm font-semibold text-red-700" role="alert"></p>
+    <button class="btn-primary mt-5 w-full" data-submit>Pokaż moją wycenę</button>
+  </form>
+
+  <div data-step="result" hidden>
+    <p class="eyebrow" data-r-eyebrow>Twoja wycena</p>
+    <h2 class="mt-1 text-2xl sm:text-3xl" data-r-title></h2>
+    <div class="mt-5 rounded-2xl bg-sand p-5">
+      <p class="text-sm font-semibold text-mute" data-r-pricelabel>Cena od, pakiet Podstawowy</p>
+      <p class="mt-1 text-3xl font-extrabold text-navy sm:text-4xl" data-r-net></p>
+      <p class="mt-1 text-sm text-mute" data-r-gross></p>
+      <ul class="mt-4 grid gap-1.5 text-sm text-ink sm:grid-cols-2">
+        {['Formalności i dokumentacja', 'Płyta fundamentowa', 'Transport w całej Polsce', 'Montaż domu', 'Dach, okna, drzwi wejściowe', 'Elewacja z deski'].map((i) => <li class="flex gap-2"><span class="font-bold text-emerald-600">✓</span>{i}</li>)}
+      </ul>
+    </div>
+    <p class="mt-4 text-sm text-mute" data-r-note></p>
+    <div class="mt-5 rounded-2xl border border-navy/10 p-5">
+      <p class="font-extrabold text-navy" data-r-next-title></p>
+      <p class="mt-1 text-sm text-mute" data-r-next></p>
+      <div class="mt-4 flex flex-col gap-3 sm:flex-row" data-r-cta></div>
+    </div>
+    <p class="mt-4 text-xs text-mute">Termin: {site.guarantee.days} dni od skompletowania formalności albo {site.guarantee.penalty} za każdy dzień opóźnienia. Ostateczną cenę potwierdzamy w umowie.</p>
+  </div>
+</section>
+
+
+<script>
+  import { sendLead, normalizePhone, validEmail, track, trackLead } from '../scripts/lead';
+  type M = { slug: string; name: string; priceFrom: number };
+  const root = document.querySelector<HTMLElement>('.quiz');
+  if (root) {
+    const models: M[] = JSON.parse(root.dataset.models!);
+    const vat = Number(root.dataset.vat);
+    const source = root.dataset.source!;
+    const KEY = 'budaro_quiz_v2';
+    const order = ['plot', 'start', 'model', 'standard', 'finance', 'place', 'contact'];
+    let a: Record<string, string> = {};
+    try { a = JSON.parse(sessionStorage.getItem(KEY) || '{}'); } catch {}
+    if (root.dataset.preselect) a.model = root.dataset.preselect;
+    let cur = 'plot', started = false;
+    const $ = <T extends HTMLElement>(s: string, el: ParentNode = root) => el.querySelector<T>(s)!;
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    const fmt = (n: number) => n.toLocaleString('pl-PL').replace(/ /g, ' ') + ' zł';
+    const save = () => { try { sessionStorage.setItem(KEY, JSON.stringify(a)); } catch {} };
+
+    function show(name: string, focus = true) {
+      cur = name;
+      steps.forEach((s) => (s.hidden = s.dataset.step !== name));
+      const i = order.indexOf(name), done = name === 'result';
+      $('[data-progress-wrap]').classList.toggle('hidden', done);
+      $('[data-back]').classList.toggle('hidden', i <= 0);
+      $<HTMLElement>('[data-bar]').style.width = (done ? 100 : Math.round((i / order.length) * 100)) + '%';
+      $('[data-count]').textContent = done ? '' : `${i + 1} z ${order.length}`;
+      const el = steps.find((s) => s.dataset.step === name)!;
+      el.querySelectorAll<HTMLElement>('.opt').forEach((b) => b.setAttribute('aria-pressed', String(a[name] === b.dataset.v)));
+      track('quiz_step', { quiz_step: name, quiz_step_index: i + 1, quiz_source: source });
+      if (focus) { el.querySelector<HTMLElement>('h2')?.setAttribute('tabindex', '-1'); el.querySelector<HTMLElement>('h2')?.focus({ preventScroll: true }); root!.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    }
+    const next = () => show(order[order.indexOf(cur) + 1]);
+
+    root.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const opt = t.closest<HTMLElement>('.opt');
+      if (opt) {
+        if (!started) { started = true; track('quiz_start', { quiz_source: source }); }
+        a[cur] = opt.dataset.v!; save(); next(); return;
+      }
+      if (t.closest('[data-back]')) { show(order[Math.max(0, order.indexOf(cur) - 1)]); return; }
+      if (t.closest('[data-skip]')) { a.postal = ''; a.city = ''; save(); next(); }
+    });
+
+    const err = (form: HTMLElement, msg: string, field?: HTMLElement) => { const p = $('[data-err]', form); p.textContent = msg; p.classList.toggle('hidden', !msg); field?.focus(); };
+
+    const place = $<HTMLFormElement>('[data-step="place"]');
+    const postal = place.elements.namedItem('postal') as HTMLInputElement;
+    postal.addEventListener('input', () => { const d = postal.value.replace(/\D/g, '').slice(0, 5); postal.value = d.length > 2 ? d.slice(0, 2) + '-' + d.slice(2) : d; });
+    place.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!/^\d{2}-\d{3}$/.test(postal.value)) return err(place, 'Wpisz kod pocztowy w formacie 00-000 albo kliknij „Nie znam jeszcze lokalizacji”.', postal);
+      err(place, ''); a.postal = postal.value; a.city = (place.elements.namedItem('city') as HTMLInputElement).value.trim(); save(); next();
+    });
+
+    const contact = $<HTMLFormElement>('[data-step="contact"]');
+    contact.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = contact.elements as any;
+      const name = f.name.value.trim(), phone = normalizePhone(f.phone.value), email = f.email.value.trim();
+      if (!name) return err(contact, 'Podaj imię.', f.name);
+      if (!phone) return err(contact, 'Podaj poprawny numer telefonu, np. 600 100 200. Numer zagraniczny zacznij od +.', f.phone);
+      if (email && !validEmail(email)) return err(contact, 'Sprawdź adres e-mail albo zostaw pole puste.', f.email);
+      if (!f.consent.checked) return err(contact, 'Zaznacz zgodę na kontakt, żebyśmy mogli potwierdzić wycenę.', f.consent);
+      err(contact, '');
+      const btn = $<HTMLButtonElement>('[data-submit]', contact); btn.disabled = true; btn.textContent = 'Wysyłam…';
+      const hasPlot = a.plot === 'yes' || a.plot === 'buying';
+      const segment = hasPlot && (a.start === '0-3' || a.start === '3-6') ? 'hot' : hasPlot || a.start !== 'later' ? 'warm' : 'nurture';
+      const m = models.find((x) => x.slug === a.model);
+      const res = await sendLead({
+        formKey: 'quiz-v2', segment, hp: f.company_site.value, consentText: root!.dataset.consent!,
+        contact: { first_name: name, phone, email: email || null, postal_code: a.postal || null, city: a.city || null },
+        answers: { hasPlot: a.plot, buildStart: a.start, model: a.model, package: a.standard, financing: a.finance, quiz_source: source, price_from_net: m?.priceFrom ?? null },
+      });
+      btn.disabled = false; btn.textContent = 'Pokaż moją wycenę';
+      if (!res.ok) return err(contact, res.reason === 'network' ? 'Nie udało się wysłać zgłoszenia. Sprawdź połączenie i spróbuj ponownie albo zadzwoń: +48 736 441 555.' : 'Zgłoszenie zostało odrzucone. Zadzwoń do nas: +48 736 441 555.');
+      trackLead(res.eventId, 'quiz-v2', segment, segment === 'hot' ? 100 : segment === 'warm' ? 30 : 5, res.demo);
+      track('quiz_complete', { quiz_source: source, lead_segment: segment });
+      result(name, segment);
+      try { sessionStorage.removeItem(KEY); } catch {}
+    });
+
+    function result(name: string, segment: string) {
+      const m = models.find((x) => x.slug === a.model);
+      const min = Math.min(...models.map((x) => x.priceFrom)), max = Math.max(...models.map((x) => x.priceFrom));
+      const g = (n: number) => fmt(Math.round(n * (1 + vat)));
+      $('[data-r-title]').textContent = m ? `${name}, Twój dom: ${m.name}` : `${name}, dobierzemy dom do Twojej działki`;
+      $('[data-r-net]').textContent = m ? `od ${fmt(m.priceFrom)} netto` : `${fmt(min)} – ${fmt(max)} netto`;
+      $('[data-r-gross]').textContent = m ? `${g(m.priceFrom)} brutto (8% VAT)` : `${g(min)} – ${g(max)} brutto (8% VAT), zależnie od modelu`;
+      if (!m) $('[data-r-pricelabel]').textContent = 'Zakres cen „od” naszych domów, pakiet Podstawowy';
+      const pk: Record<string, string> = { deweloperski: 'Deweloperski', 'deweloperski-plus': 'Deweloperski Plus' };
+      $('[data-r-note]').textContent = pk[a.standard]
+        ? `Wybrany pakiet: ${pk[a.standard]}. Dopłatę do pakietu Podstawowego doradca poda podczas rozmowy, bo zależy od wariantu układu pomieszczeń.`
+        : 'Instalacje i wykończenie wnętrza są w pakietach Deweloperski i Deweloperski Plus. Różnicę w cenie poda doradca.';
+      const cta = $('[data-r-cta]');
+      const link = (href: string, label: string, cls: string) => `<a href="${href}" class="${cls} w-full sm:w-auto">${label}</a>`;
+      if (segment === 'nurture' || a.plot === 'no') {
+        $('[data-r-next-title]').textContent = 'Najpierw działka';
+        $('[data-r-next]').textContent = 'Nie każda działka nadaje się pod dom na zgłoszenie. Pobierz checklistę i sprawdź ją przed zakupem. Możemy też bezpłatnie ocenić konkretną ofertę.';
+        cta.innerHTML = link('/materialy/checklista-dzialki/', 'Pobierz checklistę działki', 'btn-primary') + link(m ? `/domy/${m.slug}/` : '/domy/', 'Zobacz projekt', 'btn-ghost');
+      } else {
+        $('[data-r-next-title]').textContent = 'Co dalej?';
+        $('[data-r-next]').textContent = 'Doradca zadzwoni w ciągu jednego dnia roboczego, potwierdzi zakres i poda termin realizacji. Jeśli wolisz nie czekać, zadzwoń teraz.';
+        cta.innerHTML = link('tel:+48736441555', 'Zadzwoń: 736 441 555', 'btn-primary') + link(m ? `/domy/${m.slug}/` : '/domy/', 'Zobacz projekt i rzuty', 'btn-ghost');
+      }
+      show('result');
+    }
+
+    // wznowienie po odświeżeniu: wracamy do pierwszego pytania bez odpowiedzi
+    const firstOpen = order.find((s) => (s === 'place' ? a.postal === undefined : s === 'contact' ? true : !a[s])) || 'plot';
+    if (a.postal) postal.value = a.postal;
+    show(firstOpen, false);
+  }
+</script>

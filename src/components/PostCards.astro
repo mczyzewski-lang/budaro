@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import { img } from '../data/img';
+const { limit = 99, exclude = '' } = Astro.props;
+const posts = (await getCollection('poradnik')).filter((p) => p.id !== exclude).sort((a, b) => a.data.order - b.data.order).slice(0, limit);
+---
+<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  {posts.map((p) => (
+    <a href={`/poradnik/${p.id}/`} class="group overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-sm transition hover:shadow-lg">
+      <Image src={img(p.data.cover)} alt="" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 380px" class="aspect-[16/9] w-full object-cover" />
+      <div class="p-5"><p class="text-xs font-bold text-mute">{p.data.readMin} min czytania</p><p class="mt-1 text-lg font-extrabold text-navy group-hover:text-ember">{p.data.title}</p><p class="mt-2 text-sm text-mute">{p.data.description}</p></div>
+    </a>
+  ))}
+</div>

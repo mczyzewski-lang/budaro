@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /druk/
+Sitemap: https://budaro.pl/sitemap-index.xml

@@ -1,0 +1,101 @@
+---
+import Base from '../../layouts/Base.astro';
+import Quiz from '../../components/Quiz.astro';
+import VideoTestimonials from '../../components/VideoTestimonials.astro';
+import LeadMagnet from '../../components/LeadMagnet.astro';
+import { Image } from 'astro:assets';
+import { img } from '../../data/img';
+import { models, fullName, packages, facades } from '../../data/models';
+import { site, zl, brutto } from '../../data/site';
+export function getStaticPaths() { return models.map((m) => ({ params: { slug: m.slug }, props: { m } })); }
+const { m } = Astro.props;
+const name = fullName(m);
+const others = models.filter((x) => x.slug !== m.slug);
+const interiors = ['wystroj-03', 'wystroj-08', 'wystroj-09', 'wystroj-07'];
+const ld = { '@context': 'https://schema.org', '@type': 'Product', name: `Dom modułowy ${name}`, description: m.desc, brand: { '@type': 'Brand', name: 'Budaro' },
+  image: new URL(img('modele/' + m.images[0]).src, site.url).href,
+  offers: { '@type': 'Offer', priceCurrency: 'PLN', price: brutto(m.priceFrom), availability: 'https://schema.org/InStock', url: `${site.url}/domy/${m.slug}/` } };
+const crumbs = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [['Domy i ceny', '/domy/'], [name, `/domy/${m.slug}/`]].map(([n, u], i) => ({ '@type': 'ListItem', position: i + 1, name: n, item: site.url + u })) };
+const specs = [['Powierzchnia zabudowy', m.footprint], ['Powierzchnia użytkowa', m.usable], ['Powierzchnia całkowita', m.total], ['Pomieszczenia', m.rooms], ['Wysokość', m.height], ['Kąt dachu', m.roof]];
+---
+<Base title={`Dom modułowy ${name}: cena od ${zl(m.priceFrom)} | Budaro`} description={`${name}: ${m.tagline.toLowerCase()}. ${m.usable} powierzchni użytkowej, ${m.rooms} pomieszczeń. Cena od ${zl(m.priceFrom)} netto z fundamentem i montażem.`} jsonld={[ld, crumbs]} ogImage={img('modele/' + m.images[0]).src}>
+  <section class="wrap py-8 sm:py-12">
+    <nav class="text-sm text-mute" aria-label="Okruszki"><a href="/domy/" class="hover:text-ember">Domy i ceny</a> / <span class="text-navy">{name}</span></nav>
+    <div class="mt-5 grid gap-10 lg:grid-cols-[1.25fr_1fr]">
+      <div>
+        <Image src={img('modele/' + m.images[0])} alt={`Dom modułowy ${name}`} widths={[640, 1000, 1400]} sizes="(max-width: 1024px) 100vw, 660px" loading="eager" class="aspect-[4/3] w-full rounded-3xl object-cover" />
+        <div class="mt-3 grid grid-cols-4 gap-3">
+          {m.images.slice(1, 5).map((i) => <Image src={img('modele/' + i)} alt={`${name}, wizualizacja`} widths={[200, 400]} sizes="160px" class="aspect-[4/3] w-full rounded-xl object-cover" />)}
+        </div>
+      </div>
+      <div>
+        <span class="chip">{m.permit} · na zgłoszenie</span>
+        <h1 class="mt-3 text-4xl sm:text-5xl">{name}</h1>
+        <p class="mt-2 text-lg font-semibold text-ember">{m.tagline}</p>
+        <p class="mt-4 text-ink">{m.desc}</p>
+        <p class="mt-2 text-sm text-mute">{m.forWhom}</p>
+        <div class="mt-6 rounded-2xl bg-sand p-5">
+          <p class="text-sm font-semibold text-mute">Cena od, pakiet Podstawowy</p>
+          <p class="mt-1 text-3xl font-extrabold text-navy">{zl(m.priceFrom)} <span class="text-base font-semibold text-mute">netto</span></p>
+          <p class="text-sm text-mute">{zl(brutto(m.priceFrom))} brutto z 8% VAT</p>
+          <p class="mt-3 text-sm text-ink">W cenie: formalności, płyta fundamentowa, transport, montaż, dach, okna, drzwi i elewacja.</p>
+          <a href="#wycena" class="btn-primary mt-4 w-full">Wyceń {m.name} dla swojej działki</a>
+          <p class="mt-3 text-center text-xs text-mute">{site.guarantee.short}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-sand"><div class="wrap grid gap-10 lg:grid-cols-2">
+    <div>
+      <h2 class="text-2xl">Parametry</h2>
+      <dl class="mt-5 divide-y divide-navy/10 rounded-2xl border border-navy/10 bg-white">
+        {specs.map(([k, v]) => <div class="flex justify-between gap-4 px-5 py-3.5"><dt class="text-mute">{k}</dt><dd class="font-bold text-navy">{v}</dd></div>)}
+      </dl>
+      <h2 class="mt-10 text-2xl">Elewacja do wyboru</h2>
+      <div class="mt-5 grid grid-cols-3 gap-3">
+        {facades.map((f) => <div><Image src={img('img/' + f.img)} alt={f.name} widths={[200, 400]} sizes="180px" class="aspect-square w-full rounded-xl object-cover" /><p class="mt-2 text-sm font-bold text-navy">{f.name}</p><p class="text-xs text-mute">{f.desc}</p></div>)}
+      </div>
+    </div>
+    <div>
+      <h2 class="text-2xl">Rzuty</h2>
+      <div class="mt-5 grid gap-4">
+        {m.plans.map((p) => <figure class="rounded-2xl border border-navy/10 bg-white p-4"><Image src={img('rzuty/' + p.file)} alt={`${name}: rzut, ${p.label.toLowerCase()}`} widths={[500, 1000]} sizes="(max-width: 1024px) 100vw, 520px" class="w-full" /><figcaption class="mt-2 text-center text-sm font-bold text-navy">{p.label}</figcaption></figure>)}
+      </div>
+    </div>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <h2 class="h2">Co dostajesz w każdym pakiecie</h2>
+    <div class="mt-8 grid gap-5 md:grid-cols-3">
+      {packages.map((p, i) => <div class:list={['card', i === 0 && 'border-2 !border-ember']}><h3 class="text-xl">{p.name}</h3><p class="mt-1 text-sm text-mute">{p.short}</p>{i === 0 ? <p class="mt-3 text-lg font-extrabold text-navy">od {zl(m.priceFrom)} netto</p> : <p class="mt-3 text-sm font-bold text-ember">Dopłatę podajemy w wycenie</p>}<ul class="mt-4 grid gap-2 text-sm">{p.items.map((it) => <li class="tick">{it}</li>)}</ul></div>)}
+    </div>
+  </div></section>
+
+  <section class="section bg-sand"><div class="wrap">
+    <h2 class="h2">Możliwe wykończenie wnętrza</h2>
+    <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {interiors.map((i) => <Image src={img('wnetrza/' + i)} alt="Przykładowa aranżacja wnętrza domu modułowego" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 280px" class="aspect-[16/10] w-full rounded-xl object-cover" />)}
+    </div>
+    <p class="mt-3 text-xs text-mute">Wizualizacje przykładowych aranżacji.</p>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <h2 class="h2">Klienci o współpracy</h2>
+    <div class="mt-8"><VideoTestimonials limit={3} /></div>
+  </div></section>
+
+  <section class="section bg-navy" id="wycena"><div class="wrap">
+    <h2 class="text-center text-3xl !text-white sm:text-4xl">Wyceń {name} dla swojej działki</h2>
+    <p class="mx-auto mt-3 max-w-xl text-center text-white/75">Sześć pytań o działkę, termin i standard. Cenę zobaczysz od razu.</p>
+    <div class="mt-8"><Quiz preselect={m.slug} source={`model-${m.slug}`} /></div>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <LeadMagnet slug="katalog-z-cenami" />
+    <h2 class="mt-14 text-2xl">Pozostałe domy</h2>
+    <ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {others.map((o) => <li><a href={`/domy/${o.slug}/`} class="card block !p-4 hover:border-ember"><span class="font-extrabold text-navy">{fullName(o)}</span><span class="block text-sm text-mute">od {zl(o.priceFrom)} netto</span></a></li>)}
+    </ul>
+  </div></section>
+</Base>

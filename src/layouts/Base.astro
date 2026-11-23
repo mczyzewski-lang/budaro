@@ -1,0 +1,73 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+interface Props { title: string; description: string; bare?: boolean; noindex?: boolean; jsonld?: object[]; ogImage?: string; }
+const { title, description, bare = false, noindex = false, jsonld = [], ogImage } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const gtm = import.meta.env.PUBLIC_GTM_ID;
+const org = {
+  '@context': 'https://schema.org', '@type': 'HomeAndConstructionBusiness', name: site.name, legalName: site.legalName,
+  url: site.url, telephone: site.phone, email: site.email, taxID: site.nip, logo: site.url + '/logo/logo-dark.svg',
+  address: { '@type': 'PostalAddress', streetAddress: `${site.city}, ${site.street}`, postalCode: '63-004', addressLocality: 'Tulce', addressRegion: site.region, addressCountry: 'PL' },
+  areaServed: 'PL',
+};
+---
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="icon" href="/logo/favicon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, site.url).href} />}
+    <meta name="theme-color" content="#0b162a" />
+    {[org, ...jsonld].map((j) => <script type="application/ld+json" set:html={JSON.stringify(j)} />)}
+    <script is:inline>
+      // Atrybucja pierwszego wejścia: zapisywana raz na sesję, dołączana do każdego leada.
+      (function () {
+        try {
+          var k = 'budaro_attr';
+          if (!sessionStorage.getItem(k)) {
+            var q = new URLSearchParams(location.search), a = { landing_path: location.pathname, referrer: document.referrer || null };
+            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid', 'fbclid'].forEach(function (p) { a[p] = q.get(p); });
+            if (!a.utm_source && location.pathname.indexOf('/lp/google') === 0) a.utm_source = 'google';
+            if (!a.utm_source && location.pathname.indexOf('/lp/meta') === 0) a.utm_source = 'facebook';
+            sessionStorage.setItem(k, JSON.stringify(a));
+          }
+          if (!sessionStorage.getItem('budaro_session_id')) sessionStorage.setItem('budaro_session_id', (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()));
+        } catch (e) {}
+        window.dataLayer = window.dataLayer || [];
+      })();
+    </script>
+    {gtm && <script is:inline define:vars={{ gtm }}>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',gtm);</script>}
+  </head>
+  <body>
+    <a href="#tresc" class="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Przejdź do treści</a>
+    <Header bare={bare} />
+    <main id="tresc"><slot /></main>
+    <Footer bare={bare} />
+    <script>
+      // Wideo Vimeo ładowane dopiero po kliknięciu w miniaturę.
+      document.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest<HTMLElement>('[data-vimeo]');
+        if (!b) return;
+        const f = document.createElement('iframe');
+        f.src = `https://player.vimeo.com/video/${b.dataset.vimeo}?autoplay=1&title=0&byline=0&portrait=0`;
+        f.allow = 'autoplay; fullscreen; picture-in-picture'; f.allowFullscreen = true; f.title = b.dataset.title || 'Wideo';
+        f.className = 'absolute inset-0 h-full w-full';
+        b.replaceChildren(f);
+        (window as any).dataLayer?.push({ event: 'video_play', video_id: b.dataset.vimeo });
+      });
+    </script>
+  </body>
+</html>

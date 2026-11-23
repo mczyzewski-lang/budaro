@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+<Base title="Polityka prywatności | Budaro" description="Informacje o przetwarzaniu danych osobowych przez Budaro." noindex>
+  <section class="wrap max-w-3xl py-14">
+    <h1 class="text-4xl">Polityka prywatności</h1>
+    <p class="mt-6 rounded-xl border-2 border-dashed border-ember bg-sun-100 p-4 text-sm font-semibold text-navy">DO UZUPEŁNIENIA przed publikacją: wklej tu obowiązującą treść polityki prywatności i klauzuli informacyjnej.</p>
+    <p class="mt-6 text-ink">Administratorem danych jest {site.legalName}, {site.city}, {site.street}, {site.postal}, NIP {site.nip}. Kontakt: <a class="underline" href={`mailto:${site.email}`}>{site.email}</a>.</p>
+  </section>
+</Base>

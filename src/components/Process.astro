@@ -1,0 +1,28 @@
+---
+import { process } from '../data/proof';
+import { Image } from 'astro:assets';
+import { img } from '../data/img';
+const { media = true } = Astro.props;
+---
+<ol class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  {process.map((p, i) => (
+    <li class="overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-sm">
+      {media && (p.video
+        ? <video class="aspect-video w-full bg-navy object-cover" muted loop playsinline preload="none" data-autoplay poster={`/video/${p.video}.jpg`} src={`/video/${p.video}.mp4`} aria-label={p.t}></video>
+        : <Image src={img('img/' + p.img)} alt={p.t} widths={[400, 800]} sizes="400px" class="aspect-video w-full object-cover" />)}
+      <div class="p-5">
+        <div class="flex items-center justify-between gap-3">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-sun font-extrabold text-navy">{i + 1}</span>
+          <span class="chip">{p.d}</span>
+        </div>
+        <h3 class="mt-3 text-lg">{p.t}</h3>
+        <p class="mt-1 text-sm text-mute">{p.text}</p>
+      </div>
+    </li>
+  ))}
+</ol>
+<script>
+  // krótkie klipy procesu startują dopiero, gdy pojawią się na ekranie
+  const io = new IntersectionObserver((es) => es.forEach((e) => { const v = e.target as HTMLVideoElement; e.isIntersecting ? v.play().catch(() => {}) : v.pause(); }), { threshold: 0.4 });
+  document.querySelectorAll('video[data-autoplay]').forEach((v) => io.observe(v));
+</script>

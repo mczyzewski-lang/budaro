@@ -1,0 +1,168 @@
+import { site } from './site';
+import { km, nearestRealization } from './realizations';
+
+// Strony "Domy modułowe {miasto}". Żeby dodać miasto, dopisz wiersz — strona, linki w stopce
+// i sąsiednie miasta wygenerują się same.
+// UWAGA: adresy urzędów wpisane z pamięci, przed publikacją potwierdź je na stronach urzędów (pole `adres`).
+// null = adres celowo pominięty (brak pewności) — strona pokaże samą nazwę urzędu.
+export type Urzad = { nazwa: string; wydzial?: string; adres: string | null };
+export type City = {
+  slug: string; name: string; loc: string; gen: string; pod: string; woj: string;
+  geo: { lat: number; lon: number };
+  /** miasto na prawach powiatu: zgłoszenie dla działki w granicach miasta przyjmuje prezydent miasta */
+  grodzkie: boolean;
+  miasto?: Urzad;
+  powiat: { nazwa: string; urzad: Urzad; gminy: string[] };
+  inne?: string[]; // sąsiednie powiaty, w których klienci często kupują działki
+  tip?: string;
+};
+
+const c = (
+  slug: string, name: string, loc: string, gen: string, pod: string, woj: string, lat: number, lon: number,
+  grodzkie: boolean, miasto: Urzad | undefined, powiat: City['powiat'], extra: Partial<City> = {},
+): City => ({ slug, name, loc, gen, pod, woj, geo: { lat, lon }, grodzkie, miasto, powiat, ...extra });
+
+export const cities: City[] = [
+  c('poznan', 'Poznań', 'w Poznaniu', 'Poznania', 'pod Poznaniem', 'wielkopolskie', 52.41, 16.93, true,
+    { nazwa: 'Urząd Miasta Poznania', wydzial: 'Wydział Urbanistyki i Architektury', adres: 'pl. Kolegiacki 17, Poznań' },
+    { nazwa: 'powiat poznański', urzad: { nazwa: 'Starostwo Powiatowe w Poznaniu', wydzial: 'Wydział Administracji Architektoniczno-Budowlanej', adres: 'ul. Jackowskiego 18, Poznań' },
+      gminy: ['Swarzędz', 'Kórnik', 'Dopiewo', 'Rokietnica', 'Czerwonak', 'Kleszczewo', 'Komorniki', 'Tarnowo Podgórne', 'Suchy Las'] },
+    { tip: 'Nasza hala produkcyjna stoi w Gowarzewie, kilkanaście kilometrów od centrum Poznania. Przed podpisaniem umowy możesz przyjechać i zobaczyć, jak powstają moduły.' }),
+  c('warszawa', 'Warszawa', 'w Warszawie', 'Warszawy', 'pod Warszawą', 'mazowieckie', 52.23, 21.01, true,
+    { nazwa: 'Urząd m.st. Warszawy', wydzial: 'Wydział Architektury i Budownictwa w urzędzie Twojej dzielnicy', adres: null },
+    { nazwa: 'powiat piaseczyński', urzad: { nazwa: 'Starostwo Powiatowe w Piasecznie', adres: 'ul. Chyliczkowska 14, Piaseczno' },
+      gminy: ['Piaseczno', 'Konstancin-Jeziorna', 'Lesznowola', 'Góra Kalwaria', 'Prażmów', 'Tarczyn'] },
+    { inne: ['warszawski zachodni', 'legionowski', 'wołomiński', 'otwocki', 'pruszkowski', 'nowodworski'],
+      tip: 'W Warszawie zgłoszenia nie składa się w ratuszu, tylko w wydziale architektury urzędu dzielnicy, w której leży działka. Pod Warszawą liczy się powiat: Piaseczno, Ożarów Mazowiecki, Legionowo, Wołomin, Otwock albo Pruszków.' }),
+  c('wroclaw', 'Wrocław', 'we Wrocławiu', 'Wrocławia', 'pod Wrocławiem', 'dolnośląskie', 51.11, 17.03, true,
+    { nazwa: 'Urząd Miejski Wrocławia', wydzial: 'Wydział Architektury i Zabytków', adres: 'pl. Nowy Targ 1–8, Wrocław' },
+    { nazwa: 'powiat wrocławski', urzad: { nazwa: 'Starostwo Powiatowe we Wrocławiu', adres: 'ul. Kościuszki 131, Wrocław' },
+      gminy: ['Długołęka', 'Kobierzyce', 'Siechnice', 'Czernica', 'Kąty Wrocławskie', 'Żórawina', 'Sobótka'] },
+    { inne: ['trzebnicki', 'oleśnicki', 'średzki'] }),
+  c('krakow', 'Kraków', 'w Krakowie', 'Krakowa', 'pod Krakowem', 'małopolskie', 50.06, 19.94, true,
+    { nazwa: 'Urząd Miasta Krakowa', wydzial: 'Wydział Architektury i Urbanistyki', adres: 'Rynek Podgórski 1, Kraków' },
+    { nazwa: 'powiat krakowski', urzad: { nazwa: 'Starostwo Powiatowe w Krakowie', adres: 'al. Słowackiego 20, Kraków' },
+      gminy: ['Zabierzów', 'Wielka Wieś', 'Zielonki', 'Michałowice', 'Liszki', 'Mogilany', 'Skawina'] },
+    { inne: ['wielicki', 'myślenicki'],
+      tip: 'W gminach podkrakowskich plany miejscowe często narzucają kąt nachylenia dachu i kolorystykę elewacji. Sprawdzamy to przed doborem projektu, żeby zgłoszenie przeszło bez poprawek.' }),
+  c('gdansk', 'Gdańsk', 'w Gdańsku', 'Gdańska', 'pod Gdańskiem', 'pomorskie', 54.35, 18.65, true,
+    { nazwa: 'Urząd Miejski w Gdańsku', wydzial: 'Wydział Urbanistyki i Architektury', adres: 'ul. Partyzantów 74, Gdańsk' },
+    { nazwa: 'powiat gdański', urzad: { nazwa: 'Starostwo Powiatowe w Pruszczu Gdańskim', adres: 'ul. Wojska Polskiego 16, Pruszcz Gdański' },
+      gminy: ['Kolbudy', 'Pruszcz Gdański', 'Trąbki Wielkie', 'Pszczółki', 'Cedry Wielkie'] },
+    { inne: ['kartuski', 'wejherowski', 'nowodworski'] }),
+  c('lodz', 'Łódź', 'w Łodzi', 'Łodzi', 'pod Łodzią', 'łódzkie', 51.76, 19.46, true,
+    { nazwa: 'Urząd Miasta Łodzi', wydzial: 'Wydział Urbanistyki i Architektury', adres: null },
+    { nazwa: 'powiat łódzki wschodni', urzad: { nazwa: 'Starostwo Powiatowe w Łodzi', adres: 'ul. Sienkiewicza 3, Łódź' },
+      gminy: ['Andrespol', 'Brójce', 'Koluszki', 'Nowosolna', 'Rzgów', 'Tuszyn'] },
+    { inne: ['zgierski', 'pabianicki', 'brzeziński'] }),
+  c('szczecin', 'Szczecin', 'w Szczecinie', 'Szczecina', 'pod Szczecinem', 'zachodniopomorskie', 53.43, 14.55, true,
+    { nazwa: 'Urząd Miasta Szczecin', wydzial: 'Wydział Architektury i Budownictwa', adres: 'pl. Armii Krajowej 1, Szczecin' },
+    { nazwa: 'powiat policki', urzad: { nazwa: 'Starostwo Powiatowe w Policach', adres: 'ul. Tanowska 8, Police' },
+      gminy: ['Dobra', 'Kołbaskowo', 'Police', 'Nowe Warpno'] },
+    { inne: ['goleniowski', 'stargardzki', 'gryfiński'] }),
+  c('bydgoszcz', 'Bydgoszcz', 'w Bydgoszczy', 'Bydgoszczy', 'pod Bydgoszczą', 'kujawsko-pomorskie', 53.12, 18.0, true,
+    { nazwa: 'Urząd Miasta Bydgoszczy', wydzial: 'Wydział Administracji Budowlanej', adres: 'ul. Grudziądzka 9–15, Bydgoszcz' },
+    { nazwa: 'powiat bydgoski', urzad: { nazwa: 'Starostwo Powiatowe w Bydgoszczy', adres: 'ul. Konarskiego 1–3, Bydgoszcz' },
+      gminy: ['Osielsko', 'Białe Błota', 'Sicienko', 'Dobrcz', 'Nowa Wieś Wielka', 'Koronowo', 'Solec Kujawski'] }),
+  c('torun', 'Toruń', 'w Toruniu', 'Torunia', 'pod Toruniem', 'kujawsko-pomorskie', 53.01, 18.6, true,
+    { nazwa: 'Urząd Miasta Torunia', wydzial: 'Wydział Architektury i Budownictwa', adres: 'ul. Grudziądzka 126b, Toruń' },
+    { nazwa: 'powiat toruński', urzad: { nazwa: 'Starostwo Powiatowe w Toruniu', adres: 'ul. Towarowa 4–6, Toruń' },
+      gminy: ['Lubicz', 'Łysomice', 'Zławieś Wielka', 'Obrowo', 'Wielka Nieszawka', 'Chełmża'] }),
+  c('zielona-gora', 'Zielona Góra', 'w Zielonej Górze', 'Zielonej Góry', 'pod Zieloną Górą', 'lubuskie', 51.94, 15.51, true,
+    { nazwa: 'Urząd Miasta Zielona Góra', wydzial: 'wydział zajmujący się administracją budowlaną', adres: null },
+    { nazwa: 'powiat zielonogórski', urzad: { nazwa: 'Starostwo Powiatowe w Zielonej Górze', adres: 'ul. Podgórna 5, Zielona Góra' },
+      gminy: ['Świdnica', 'Zabór', 'Czerwieńsk', 'Sulechów', 'Nowogród Bobrzański'] },
+    { tip: 'Od 2015 roku dawna gmina wiejska Zielona Góra jest częścią miasta. Działka w Przylepie, Ochli czy Raculi to administracyjnie miasto, więc zgłoszenie składa się w urzędzie miasta, a nie w starostwie.' }),
+  c('gorzow-wielkopolski', 'Gorzów Wielkopolski', 'w Gorzowie Wielkopolskim', 'Gorzowa Wielkopolskiego', 'pod Gorzowem', 'lubuskie', 52.73, 15.24, true,
+    { nazwa: 'Urząd Miasta Gorzowa Wielkopolskiego', wydzial: 'wydział zajmujący się administracją budowlaną', adres: null },
+    { nazwa: 'powiat gorzowski', urzad: { nazwa: 'Starostwo Powiatowe w Gorzowie Wielkopolskim', adres: 'ul. Pankiewicza 5–7, Gorzów Wielkopolski' },
+      gminy: ['Deszczno', 'Kłodawa', 'Santok', 'Bogdaniec', 'Lubiszyn', 'Witnica'] },
+    { inne: ['międzyrzecki'] }),
+  c('opole', 'Opole', 'w Opolu', 'Opola', 'pod Opolem', 'opolskie', 50.67, 17.93, true,
+    { nazwa: 'Urząd Miasta Opola', wydzial: 'Wydział Urbanistyki, Architektury i Budownictwa', adres: 'pl. Wolności 7–8, Opole' },
+    { nazwa: 'powiat opolski', urzad: { nazwa: 'Starostwo Powiatowe w Opolu', adres: 'ul. 1 Maja 29, Opole' },
+      gminy: ['Dobrzeń Wielki', 'Komprachcice', 'Chrząstowice', 'Dąbrowa', 'Turawa', 'Łubniany', 'Prószków'] },
+    { inne: ['brzeski', 'krapkowicki'] }),
+  c('katowice', 'Katowice', 'w Katowicach', 'Katowic', 'pod Katowicami', 'śląskie', 50.26, 19.02, true,
+    { nazwa: 'Urząd Miasta Katowice', wydzial: 'wydział budownictwa', adres: 'Rynek 13, Katowice' },
+    { nazwa: 'powiat mikołowski', urzad: { nazwa: 'Starostwo Powiatowe w Mikołowie', adres: 'ul. Żwirki i Wigury 4a, Mikołów' },
+      gminy: ['Mikołów', 'Łaziska Górne', 'Orzesze', 'Ornontowice', 'Wyry'] },
+    { inne: ['bieruńsko-lędziński', 'będziński', 'tarnogórski', 'pszczyński'],
+      tip: 'Na Śląsku przed zakupem działki sprawdzamy także teren górniczy i kategorię szkód. Od tego zależy, czy płyta fundamentowa wymaga dodatkowego zbrojenia.' }),
+  c('legnica', 'Legnica', 'w Legnicy', 'Legnicy', 'pod Legnicą', 'dolnośląskie', 51.21, 16.16, true,
+    { nazwa: 'Urząd Miasta Legnicy', adres: 'pl. Słowiański 8, Legnica' },
+    { nazwa: 'powiat legnicki', urzad: { nazwa: 'Starostwo Powiatowe w Legnicy', adres: 'pl. Słowiański 1, Legnica' },
+      gminy: ['Kunice', 'Miłkowice', 'Krotoszyce', 'Legnickie Pole', 'Chojnów', 'Prochowice'] }),
+  c('jelenia-gora', 'Jelenia Góra', 'w Jeleniej Górze', 'Jeleniej Góry', 'pod Jelenią Górą', 'dolnośląskie', 50.9, 15.73, true,
+    { nazwa: 'Urząd Miasta Jelenia Góra', adres: 'pl. Ratuszowy 58, Jelenia Góra' },
+    { nazwa: 'powiat karkonoski', urzad: { nazwa: 'Starostwo Powiatowe w Jeleniej Górze', adres: 'ul. Kochanowskiego 10, Jelenia Góra' },
+      gminy: ['Jeżów Sudecki', 'Mysłakowice', 'Podgórzyn', 'Janowice Wielkie', 'Stara Kamienica', 'Piechowice', 'Karpacz'] },
+    { tip: 'W Karkonoszach wiele działek leży na stoku i w otulinie parku narodowego. Spadek terenu wpływa na koszt płyty fundamentowej, dlatego wyceniamy go osobno po obejrzeniu działki.' }),
+  c('walbrzych', 'Wałbrzych', 'w Wałbrzychu', 'Wałbrzycha', 'pod Wałbrzychem', 'dolnośląskie', 50.77, 16.28, true,
+    { nazwa: 'Urząd Miejski w Wałbrzychu', adres: null },
+    { nazwa: 'powiat wałbrzyski', urzad: { nazwa: 'Starostwo Powiatowe w Wałbrzychu', adres: 'al. Wyzwolenia 20–24, Wałbrzych' },
+      gminy: ['Szczawno-Zdrój', 'Jedlina-Zdrój', 'Walim', 'Głuszyca', 'Czarny Bór', 'Mieroszów', 'Stare Bogaczowice'] },
+    { inne: ['świdnicki'] }),
+  c('kalisz', 'Kalisz', 'w Kaliszu', 'Kalisza', 'pod Kaliszem', 'wielkopolskie', 51.76, 18.09, true,
+    { nazwa: 'Urząd Miasta Kalisza', adres: null },
+    { nazwa: 'powiat kaliski', urzad: { nazwa: 'Starostwo Powiatowe w Kaliszu', adres: 'pl. Świętego Józefa 5, Kalisz' },
+      gminy: ['Opatówek', 'Żelazków', 'Godziesze Wielkie', 'Blizanów', 'Koźminek', 'Stawiszyn'] }),
+  c('ostrow-wielkopolski', 'Ostrów Wielkopolski', 'w Ostrowie Wielkopolskim', 'Ostrowa Wielkopolskiego', 'pod Ostrowem', 'wielkopolskie', 51.65, 17.81, false, undefined,
+    { nazwa: 'powiat ostrowski', urzad: { nazwa: 'Starostwo Powiatowe w Ostrowie Wielkopolskim', adres: 'al. Powstańców Wielkopolskich 16, Ostrów Wielkopolski' },
+      gminy: ['Ostrów Wielkopolski', 'Przygodzice', 'Nowe Skalmierzyce', 'Raszków', 'Odolanów', 'Sieroszewice'] }),
+  c('leszno', 'Leszno', 'w Lesznie', 'Leszna', 'pod Lesznem', 'wielkopolskie', 51.84, 16.57, true,
+    { nazwa: 'Urząd Miasta Leszna', adres: null },
+    { nazwa: 'powiat leszczyński', urzad: { nazwa: 'Starostwo Powiatowe w Lesznie', adres: 'pl. Kościuszki 4b, Leszno' },
+      gminy: ['Lipno', 'Święciechowa', 'Rydzyna', 'Osieczna', 'Włoszakowice', 'Krzemieniewo'] }),
+  c('konin', 'Konin', 'w Koninie', 'Konina', 'pod Koninem', 'wielkopolskie', 52.22, 18.25, true,
+    { nazwa: 'Urząd Miejski w Koninie', adres: null },
+    { nazwa: 'powiat koniński', urzad: { nazwa: 'Starostwo Powiatowe w Koninie', adres: 'al. 1 Maja 9, Konin' },
+      gminy: ['Stare Miasto', 'Kazimierz Biskupi', 'Golina', 'Kramsk', 'Krzymów', 'Ślesin'] },
+    { tip: 'Okolice Ślesina i jezior konińskich to popularne miejsce na dom rekreacyjny. Przy działkach nad wodą sprawdzamy strefę zalewową i linię zabudowy od brzegu.' }),
+  c('gniezno', 'Gniezno', 'w Gnieźnie', 'Gniezna', 'pod Gnieznem', 'wielkopolskie', 52.53, 17.6, false, undefined,
+    { nazwa: 'powiat gnieźnieński', urzad: { nazwa: 'Starostwo Powiatowe w Gnieźnie', adres: 'ul. Papieża Jana Pawła II 9/10, Gniezno' },
+      gminy: ['Gniezno', 'Łubowo', 'Kiszkowo', 'Czerniejewo', 'Niechanowo', 'Witkowo'] }),
+  c('pila', 'Piła', 'w Pile', 'Piły', 'pod Piłą', 'wielkopolskie', 53.15, 16.74, false, undefined,
+    { nazwa: 'powiat pilski', urzad: { nazwa: 'Starostwo Powiatowe w Pile', adres: 'al. Niepodległości 33/35, Piła' },
+      gminy: ['Piła', 'Szydłowo', 'Kaczory', 'Ujście', 'Wysoka', 'Wyrzysk'] }),
+  c('koszalin', 'Koszalin', 'w Koszalinie', 'Koszalina', 'pod Koszalinem', 'zachodniopomorskie', 54.19, 16.17, true,
+    { nazwa: 'Urząd Miejski w Koszalinie', adres: null },
+    { nazwa: 'powiat koszaliński', urzad: { nazwa: 'Starostwo Powiatowe w Koszalinie', adres: 'ul. Racławicka 13, Koszalin' },
+      gminy: ['Mielno', 'Sianów', 'Będzino', 'Biesiekierz', 'Manowo', 'Świeszyno'] },
+    { tip: 'Pas nadmorski (Mielno, Sarbinowo, Gąski) to głównie domy rekreacyjne i pod wynajem. Dom pod wynajem nie korzysta z uproszczonej ścieżki dla domów do 70 m² na własne potrzeby, więc tryb formalny dobieramy do celu inwestycji.' }),
+  c('olsztyn', 'Olsztyn', 'w Olsztynie', 'Olsztyna', 'pod Olsztynem', 'warmińsko-mazurskie', 53.78, 20.48, true,
+    { nazwa: 'Urząd Miasta Olsztyna', adres: 'pl. Jana Pawła II 1, Olsztyn' },
+    { nazwa: 'powiat olsztyński', urzad: { nazwa: 'Starostwo Powiatowe w Olsztynie', adres: 'pl. Bema 5, Olsztyn' },
+      gminy: ['Stawiguda', 'Dywity', 'Purda', 'Gietrzwałd', 'Jonkowo', 'Barczewo'] },
+    { tip: 'Na Warmii i Mazurach duża część działek leży w obszarach chronionego krajobrazu, gdzie obowiązuje zakaz zabudowy w pasie 100 m od jezior i rzek. Sprawdzamy to przed zakupem działki.' }),
+  c('lublin', 'Lublin', 'w Lublinie', 'Lublina', 'pod Lublinem', 'lubelskie', 51.25, 22.57, true,
+    { nazwa: 'Urząd Miasta Lublin', wydzial: 'Wydział Architektury i Budownictwa', adres: 'ul. Wieniawska 14, Lublin' },
+    { nazwa: 'powiat lubelski', urzad: { nazwa: 'Starostwo Powiatowe w Lublinie', adres: 'ul. Spokojna 9, Lublin' },
+      gminy: ['Głusk', 'Konopnica', 'Jastków', 'Niemce', 'Wólka', 'Strzyżewice'] }),
+  c('rzeszow', 'Rzeszów', 'w Rzeszowie', 'Rzeszowa', 'pod Rzeszowem', 'podkarpackie', 50.04, 22.0, true,
+    { nazwa: 'Urząd Miasta Rzeszowa', wydzial: 'Wydział Architektury', adres: null },
+    { nazwa: 'powiat rzeszowski', urzad: { nazwa: 'Starostwo Powiatowe w Rzeszowie', adres: 'ul. Grunwaldzka 15, Rzeszów' },
+      gminy: ['Trzebownisko', 'Krasne', 'Świlcza', 'Boguchwała', 'Głogów Małopolski', 'Tyczyn'] }),
+  c('bialystok', 'Białystok', 'w Białymstoku', 'Białegostoku', 'pod Białymstokiem', 'podlaskie', 53.13, 23.16, true,
+    { nazwa: 'Urząd Miejski w Białymstoku', adres: null },
+    { nazwa: 'powiat białostocki', urzad: { nazwa: 'Starostwo Powiatowe w Białymstoku', adres: 'ul. Borsucza 2, Białystok' },
+      gminy: ['Juchnowiec Kościelny', 'Supraśl', 'Wasilków', 'Choroszcz', 'Dobrzyniewo Duże', 'Zabłudów'] }),
+  c('kielce', 'Kielce', 'w Kielcach', 'Kielc', 'pod Kielcami', 'świętokrzyskie', 50.87, 20.63, true,
+    { nazwa: 'Urząd Miasta Kielce', adres: null },
+    { nazwa: 'powiat kielecki', urzad: { nazwa: 'Starostwo Powiatowe w Kielcach', adres: 'ul. Wrzosowa 44, Kielce' },
+      gminy: ['Morawica', 'Masłów', 'Sitkówka-Nowiny', 'Zagnańsk', 'Miedziana Góra', 'Daleszyce', 'Piekoszów'] }),
+  c('trzebnica', 'Trzebnica', 'w Trzebnicy', 'Trzebnicy', 'pod Trzebnicą', 'dolnośląskie', 51.31, 17.06, false, undefined,
+    { nazwa: 'powiat trzebnicki', urzad: { nazwa: 'Starostwo Powiatowe w Trzebnicy', adres: 'ul. Leśna 1, Trzebnica' },
+      gminy: ['Trzebnica', 'Oborniki Śląskie', 'Wisznia Mała', 'Zawonia', 'Żmigród', 'Prusice'] }),
+  c('czluchow', 'Człuchów', 'w Człuchowie', 'Człuchowa', 'pod Człuchowem', 'pomorskie', 53.67, 17.36, false, undefined,
+    { nazwa: 'powiat człuchowski', urzad: { nazwa: 'Starostwo Powiatowe w Człuchowie', adres: 'al. Wojska Polskiego 1, Człuchów' },
+      gminy: ['Człuchów', 'Debrzno', 'Przechlewo', 'Rzeczenica', 'Czarne', 'Koczała'] }),
+];
+
+export const cityBySlug = (s: string) => cities.find((x) => x.slug === s)!;
+
+/** przybliżona odległość drogowa z hali w Gowarzewie (linia prosta × 1,25, zaokrąglona do 10 km) */
+export const roadKmFromFactory = (city: City) => Math.max(10, Math.round((km(site.geo, city.geo) * 1.25) / 10) * 10);
+export const nearbyCities = (city: City, n = 5) =>
+  cities.filter((x) => x.slug !== city.slug).map((x) => ({ x, d: km(city.geo, x.geo) })).sort((a, b) => a.d - b.d).slice(0, n).map((o) => o.x);
+export const cityNearest = (city: City) => nearestRealization(city.geo);

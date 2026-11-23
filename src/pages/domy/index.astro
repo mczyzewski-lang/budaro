@@ -1,0 +1,24 @@
+---
+import Base from '../../layouts/Base.astro';
+import ModelsGrid from '../../components/ModelsGrid.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Guarantee from '../../components/Guarantee.astro';
+import { packages } from '../../data/models';
+import { site, zl } from '../../data/site';
+---
+<Base title="Projekty domów modułowych z cenami | Budaro" description={`Pięć całorocznych domów modułowych od 40 do 115 m², na zgłoszenie. Ceny od ${zl(site.priceFrom)} netto z fundamentem, transportem i montażem.`}>
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">Projekty i ceny</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl">Domy modułowe z cenami</h1>
+    <p class="lead max-w-2xl">Wszystkie domy są całoroczne i stawiane na zgłoszenie. Cena „od” to pakiet Podstawowy, netto, z formalnościami, fundamentem, transportem i montażem.</p>
+    <div class="mt-10"><ModelsGrid heading="h2" /></div>
+  </div></section>
+  <section class="section bg-sand"><div class="wrap">
+    <h2 class="h2">Trzy pakiety wykonania</h2>
+    <div class="mt-8 grid gap-5 md:grid-cols-3">
+      {packages.map((p) => <div class="card"><h3 class="text-xl">{p.name}</h3><p class="mt-1 text-sm text-mute">{p.short}</p><ul class="mt-4 grid gap-2 text-sm">{p.items.map((i) => <li class="tick">{i}</li>)}</ul></div>)}
+    </div>
+  </div></section>
+  <Guarantee />
+  <CtaBand />
+</Base>

@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Process from '../components/Process.astro';
+import Guarantee from '../components/Guarantee.astro';
+import Compare from '../components/Compare.astro';
+import LeadMagnet from '../components/LeadMagnet.astro';
+import CtaBand from '../components/CtaBand.astro';
+---
+<Base title="Jak budujemy dom modułowy: proces i gwarancja terminu | Budaro" description="Sześć etapów od wyboru projektu do kluczy. Formalności po naszej stronie, montaż w 3–4 dni, gwarancja 90 dni albo 1000 zł za dzień.">
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">Jak to działa</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl">Ty podejmujesz decyzję. My oddajemy klucze.</h1>
+    <p class="lead max-w-2xl">Jedna firma i jedna umowa na wszystko: projekt, urząd, fundament, dom, instalacje i odbiór.</p>
+    <div class="mt-10"><Process /></div>
+  </div></section>
+  <Guarantee />
+  <section class="section"><div class="wrap">
+    <h2 class="h2">Dlaczego to działa szybciej niż budowa tradycyjna</h2>
+    <p class="lead max-w-3xl">95% domu powstaje w hali produkcyjnej w Wielkopolsce, w stałej temperaturze i bez przestojów na pogodę. Na działkę przyjeżdżają gotowe elementy.</p>
+    <div class="mt-8"><Compare /></div>
+    <div class="mt-12"><LeadMagnet slug="formalnosci-krok-po-kroku" /></div>
+  </div></section>
+  <CtaBand />
+</Base>

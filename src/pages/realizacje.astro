@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import VideoTestimonials from '../components/VideoTestimonials.astro';
+import Gallery from '../components/Gallery.astro';
+import RealizationPlaces from '../components/RealizationPlaces.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { reviews, handoverVideoId } from '../data/proof';
+import { Image } from 'astro:assets';
+import { img } from '../data/img';
+import { site } from '../data/site';
+const ids = Array.from({ length: 50 }, (_, i) => i + 1).filter((n) => n !== 31);
+---
+<Base title="Realizacje domów modułowych: zdjęcia i opinie wideo | Budaro" description={`Zdjęcia z budów i opinie wideo klientów. ${site.stats.houses} zrealizowanych domów modułowych w całej Polsce.`}>
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">Realizacje</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl">{site.stats.houses} domów. Zobacz kilka z nich.</h1>
+    <p class="lead max-w-2xl">Zdjęcia z budów i gotowych domów oraz klienci nagrani na swoich działkach.</p>
+    <div class="mt-10 grid items-center gap-8 lg:grid-cols-2">
+      <button type="button" data-vimeo={handoverVideoId} data-title="Odbiór domu u klientki" class="group relative block aspect-video w-full cursor-pointer overflow-hidden rounded-3xl bg-navy" aria-label="Odtwórz film z odbioru domu">
+        <Image src={img('img/video-thumbnail-odbior')} alt="" widths={[640, 1200]} sizes="(max-width: 1024px) 100vw, 560px" class="h-full w-full object-cover" />
+        <span class="absolute inset-0 m-auto flex h-16 w-16 items-center justify-center rounded-full bg-sun text-navy shadow-xl"><svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor"><path d="M6 4l11 6-11 6z"/></svg></span>
+      </button>
+      <div><h2 class="text-2xl">Jak wygląda odbiór domu</h2><p class="mt-3 text-mute">Film z przekazania kluczy. Bez montażu reklamowego: klientka ogląda dom i mówi, co myśli.</p></div>
+    </div>
+  </div></section>
+  <section class="section bg-sand"><div class="wrap">
+    <h2 class="h2">Opinie wideo</h2>
+    <div class="mt-8"><VideoTestimonials /></div>
+  </div></section>
+  <section class="section"><div class="wrap">
+    <h2 class="h2">Gdzie budowaliśmy</h2>
+    <div class="mt-6"><RealizationPlaces /></div>
+    <div class="mt-8"><Gallery ids={ids} /></div>
+  </div></section>
+  <section class="section bg-sand"><div class="wrap">
+    <h2 class="h2">Opinie klientów</h2>
+    <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {reviews.map((r) => <figure class="card"><p class="font-bold text-sun-600">★★★★★</p><blockquote class="mt-3 text-ink">„{r.text}”</blockquote><figcaption class="mt-4 text-sm font-bold text-navy">{r.name}</figcaption></figure>)}
+    </div>
+  </div></section>
+  <CtaBand />
+</Base>

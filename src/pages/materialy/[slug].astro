@@ -1,0 +1,24 @@
+---
+import Base from '../../layouts/Base.astro';
+import LeadMagnet from '../../components/LeadMagnet.astro';
+import PostCards from '../../components/PostCards.astro';
+import { magnets } from '../../data/magnets';
+import { site } from '../../data/site';
+export function getStaticPaths() { return Object.keys(magnets).map((slug) => ({ params: { slug } })); }
+const slug = Astro.params.slug as keyof typeof magnets;
+const m = magnets[slug];
+---
+<Base title={`${m.title} (PDF) | Budaro`} description={m.pitch}>
+  <section class="section"><div class="wrap grid items-start gap-10 lg:grid-cols-2">
+    <div>
+      <p class="eyebrow">Bezpłatny PDF</p>
+      <h1 class="mt-2 text-3xl sm:text-5xl">{m.title}</h1>
+      <p class="lead">{m.pitch}</p>
+      <h2 class="mt-8 text-xl">W środku</h2>
+      <ul class="mt-4 grid gap-3">{m.bullets.map((b) => <li class="tick text-ink">{b}</li>)}</ul>
+      <p class="mt-8 text-sm text-mute">Przygotowane przez zespół Budaro na podstawie {site.stats.houses} zrealizowanych domów.</p>
+    </div>
+    <LeadMagnet slug={slug} compact />
+  </div></section>
+  <section class="section bg-sand"><div class="wrap"><h2 class="text-2xl">Przeczytaj też</h2><div class="mt-6"><PostCards limit={3} /></div></div></section>
+</Base>

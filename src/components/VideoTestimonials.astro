@@ -1,0 +1,22 @@
+---
+import { videoTestimonials } from '../data/proof';
+import { Image } from 'astro:assets';
+import { img } from '../data/img';
+const { limit = 6, woj = '' } = Astro.props;
+// opinie z danego województwa idą na początek
+const list = [...videoTestimonials].sort((a, b) => Number(b.woj === woj) - Number(a.woj === woj)).slice(0, limit);
+---
+<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+  {list.map((v) => (
+    <figure class="overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-sm">
+      <button type="button" data-vimeo={v.id} data-title={`Opinia: ${v.name}`} class="group relative block aspect-video w-full cursor-pointer overflow-hidden bg-navy" aria-label={`Odtwórz opinię wideo: ${v.name}`}>
+        <Image src={img(`opinie/vimeo-${v.id}-miniatura`)} alt="" widths={[400, 640]} sizes="(max-width: 640px) 100vw, 380px" class="h-full w-full object-cover opacity-90 transition group-hover:scale-105" />
+        <span class="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-full bg-sun text-navy shadow-xl"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M6 4l11 6-11 6z"/></svg></span>
+      </button>
+      <blockquote class="p-5">
+        <p class="font-semibold text-navy">„{v.quote}”</p>
+        <figcaption class="mt-2 text-sm text-mute">{v.name}{v.region && `, ${v.region}`}</figcaption>
+      </blockquote>
+    </figure>
+  ))}
+</div>

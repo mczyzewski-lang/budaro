@@ -1,0 +1,48 @@
+---
+import { magnets } from '../data/magnets';
+interface Props { slug: keyof typeof magnets; compact?: boolean }
+const { slug, compact = false } = Astro.props;
+const m = magnets[slug];
+const consent = 'Zgadzam się na otrzymanie materiału i kontakt e-mailowy ze strony AV Modules Sp. z o.o. (Budaro) w sprawie domów modułowych.';
+---
+<aside class:list={['magnet rounded-2xl border-2 border-sun bg-sun-100 p-6', compact ? '' : 'sm:p-8']} data-slug={slug} data-file={m.file} data-consent={consent}>
+  <p class="eyebrow">Bezpłatny materiał · PDF</p>
+  <p class="mt-1 text-xl font-extrabold text-navy sm:text-2xl">{m.title}</p>
+  <p class="mt-2 text-sm text-ink">{m.pitch}</p>
+  <form class="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]" novalidate>
+    <input name="name" placeholder="Imię" autocomplete="given-name" aria-label="Imię" class="field" />
+    <input name="email" type="email" placeholder="E-mail" autocomplete="email" aria-label="E-mail" class="field" />
+    <input name="company_site" tabindex="-1" autocomplete="off" class="absolute -left-[9999px] h-0 w-0 opacity-0" aria-hidden="true" />
+    <button class="btn-primary">Pobierz PDF</button>
+    <label class="flex items-start gap-2 text-xs text-ink sm:col-span-3"><input type="checkbox" name="consent" class="mt-0.5 h-4 w-4 shrink-0 accent-[#e8502f]" /><span>{consent} <a href="/polityka-prywatnosci/" class="underline">Polityka prywatności</a>.</span></label>
+    <p data-err class="hidden text-sm font-semibold text-red-700 sm:col-span-3" role="alert"></p>
+  </form>
+  <div data-done hidden class="mt-4">
+    <p class="font-bold text-navy">Gotowe. Twój materiał:</p>
+    <a href={m.file} class="btn-dark mt-3" download>Pobierz: {m.title}</a>
+    <p class="mt-3 text-sm text-ink">Chcesz od razu poznać cenę domu? <a href="/wycena/" class="font-bold text-ember underline">Odpowiedz na 7 pytań</a>.</p>
+  </div>
+</aside>
+<script>
+  import { sendLead, validEmail, track, trackLead } from '../scripts/lead';
+  document.querySelectorAll<HTMLElement>('.magnet').forEach((box) => {
+    const form = box.querySelector('form')!, errEl = box.querySelector<HTMLElement>('[data-err]')!;
+    const err = (m: string) => { errEl.textContent = m; errEl.classList.toggle('hidden', !m); };
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = form.elements as any, name = f.name.value.trim(), email = f.email.value.trim();
+      if (!name) return err('Podaj imię.');
+      if (!validEmail(email)) return err('Podaj poprawny adres e-mail.');
+      if (!f.consent.checked) return err('Zaznacz zgodę, żebyśmy mogli wysłać materiał.');
+      err('');
+      const btn = form.querySelector('button')!; btn.disabled = true;
+      const key = 'lead-magnet-' + box.dataset.slug;
+      const res = await sendLead({ formKey: key, segment: 'nurture', hp: f.company_site.value, consentText: box.dataset.consent!, contact: { first_name: name, email }, answers: { magnet: box.dataset.slug } });
+      btn.disabled = false;
+      if (!res.ok) return err('Nie udało się wysłać formularza. Spróbuj ponownie za chwilę.');
+      trackLead(res.eventId, key, 'nurture', 5, res.demo);
+      track('magnet_download', { magnet: box.dataset.slug });
+      form.hidden = true; box.querySelector<HTMLElement>('[data-done]')!.hidden = false;
+    });
+  });
+</script>

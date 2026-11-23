@@ -1,0 +1,25 @@
+---
+import { site } from '../data/site';
+import { Image } from 'astro:assets';
+import { img } from '../data/img';
+const { logos = true } = Astro.props;
+const items = [
+  { v: site.stats.houses, l: 'zrealizowanych domów' },
+  { v: site.stats.rating, l: 'średnia ocen w Google' },
+  { v: site.stats.warrantyYears + ' lat', l: 'gwarancji na konstrukcję' },
+  { v: site.stats.assemblyDays + ' dni', l: 'montaż domu na działce' },
+];
+---
+<section class="border-y border-navy/10 bg-sand">
+  <div class="wrap py-8">
+    <dl class="grid grid-cols-2 gap-6 text-center lg:grid-cols-4">
+      {items.map((i) => <div><dd class="text-3xl font-extrabold text-navy">{i.v}</dd><dt class="mt-1 text-sm text-mute">{i.l}</dt></div>)}
+    </dl>
+    {logos && (
+      <div class="mt-8 text-center">
+        <p class="text-xs font-bold uppercase tracking-wider text-mute">Zarząd firmy wypowiadał się dla</p>
+        <Image src={img('img/media-logos')} alt="Business Insider, TVP, Interia, TVN24, Forbes, Onet, MSN, Forsal, Puls Biznesu, Rzeczpospolita i inne" widths={[640, 1200, 1536]} sizes="(max-width: 700px) 100vw, 900px" class="mx-auto mt-4 w-full max-w-3xl opacity-80" />
+      </div>
+    )}
+  </div>
+</section>

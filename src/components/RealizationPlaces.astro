@@ -1,0 +1,6 @@
+---
+import { realizations } from '../data/realizations';
+---
+<ul class="flex flex-wrap gap-2">
+  {realizations.map((r) => <li class="rounded-full border border-navy/15 bg-white px-3 py-1.5 text-sm font-semibold text-navy">{r.place} <span class="font-normal text-mute">· {r.model}</span></li>)}
+</ul>

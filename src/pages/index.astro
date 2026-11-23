@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import ProofBar from '../components/ProofBar.astro';
+import VideoTestimonials from '../components/VideoTestimonials.astro';
+import ModelsGrid from '../components/ModelsGrid.astro';
+import Guarantee from '../components/Guarantee.astro';
+import Compare from '../components/Compare.astro';
+import Process from '../components/Process.astro';
+import Gallery from '../components/Gallery.astro';
+import RealizationPlaces from '../components/RealizationPlaces.astro';
+import MagnetCards from '../components/MagnetCards.astro';
+import PostCards from '../components/PostCards.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { faq, reviews } from '../data/proof';
+import { site, zl } from '../data/site';
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+---
+<Base title={`Domy modułowe całoroczne od ${zl(site.priceFrom)} | Budaro`} description="Całoroczny dom modułowy z piętrem w 90 dni od formalności albo 1000 zł za każdy dzień opóźnienia. Stała cena z fundamentem, transportem i montażem. Sprawdź cenę w minutę." jsonld={[faqLd]}>
+  <Hero />
+  <ProofBar />
+
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">Opinie klientów</p>
+    <h2 class="h2">Zobacz ludzi, którzy już mieszkają w domu Budaro</h2>
+    <p class="lead max-w-2xl">Prawdziwi klienci, nagrani na swoich działkach. Kliknij, żeby obejrzeć.</p>
+    <div class="mt-8"><VideoTestimonials limit={3} /></div>
+    <a href="/realizacje/" class="mt-6 inline-block font-bold text-ember hover:underline">Wszystkie opinie i realizacje →</a>
+  </div></section>
+
+  <section class="section bg-sand" id="domy"><div class="wrap">
+    <p class="eyebrow">Projekty i ceny</p>
+    <h2 class="h2">Pięć domów. Każdy z ceną.</h2>
+    <p class="lead max-w-2xl">Ceny netto za pakiet Podstawowy: formalności, płyta fundamentowa, transport, montaż, dach, okna i elewacja. Wszystkie domy stawiamy na zgłoszenie, bez pozwolenia na budowę.</p>
+    <div class="mt-8"><ModelsGrid heading="h3" /></div>
+  </div></section>
+
+  <Guarantee />
+
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">Porównanie</p>
+    <h2 class="h2">Budaro a budowa tradycyjna</h2>
+    <div class="mt-8"><Compare /></div>
+  </div></section>
+
+  <section class="section bg-sand"><div class="wrap">
+    <p class="eyebrow">Jak to działa</p>
+    <h2 class="h2">Od decyzji do kluczy w sześciu krokach</h2>
+    <p class="lead max-w-2xl">Ty wybierasz projekt i podpisujesz umowę. Resztę robimy my.</p>
+    <div class="mt-8"><Process /></div>
+    <a href="/jak-to-dziala/" class="mt-6 inline-block font-bold text-ember hover:underline">Szczegóły procesu i gwarancji →</a>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">Realizacje</p>
+    <h2 class="h2">Budujemy w całej Polsce</h2>
+    <p class="lead max-w-2xl">Zdjęcia z budów i gotowych domów, bez wizualizacji.</p>
+    <div class="mt-6"><RealizationPlaces /></div>
+    <div class="mt-8"><Gallery ids={[13, 9, 18, 26, 32, 42, 49, 3]} /></div>
+    <a href="/realizacje/" class="mt-6 inline-block font-bold text-ember hover:underline">Zobacz wszystkie realizacje →</a>
+  </div></section>
+
+  <section class="section bg-sand"><div class="wrap">
+    <p class="eyebrow">Co mówią klienci</p>
+    <h2 class="h2">Terminowo i bez dopłat</h2>
+    <div class="mt-8 grid gap-5 md:grid-cols-3">
+      {reviews.slice(0, 3).map((r) => <figure class="card"><p class="font-bold text-sun-600">★★★★★</p><blockquote class="mt-3 text-ink">„{r.text}”</blockquote><figcaption class="mt-4 text-sm font-bold text-navy">{r.name}</figcaption></figure>)}
+    </div>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <p class="eyebrow">Do pobrania</p>
+    <h2 class="h2">Jeszcze nie czas na wycenę? Zacznij od tego</h2>
+    <div class="mt-8"><MagnetCards /></div>
+  </div></section>
+
+  <section class="section bg-sand"><div class="wrap">
+    <p class="eyebrow">Poradnik</p>
+    <h2 class="h2">Zanim podpiszesz jakąkolwiek umowę</h2>
+    <div class="mt-8"><PostCards limit={3} /></div>
+    <a href="/poradnik/" class="mt-6 inline-block font-bold text-ember hover:underline">Wszystkie artykuły →</a>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <h2 class="h2 text-center">Najczęstsze pytania</h2>
+    <div class="mt-8"><Faq /></div>
+  </div></section>
+
+  <CtaBand />
+</Base>

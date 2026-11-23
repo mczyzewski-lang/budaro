@@ -1,0 +1,20 @@
+---
+import { site } from '../data/site';
+---
+<section class="bg-navy text-white">
+  <div class="wrap section grid items-center gap-10 lg:grid-cols-[1.2fr_1fr]">
+    <div>
+      <p class="eyebrow !text-sun">Gwarancja terminu</p>
+      <h2 class="mt-2 text-3xl !text-white sm:text-5xl">{site.guarantee.days} dni albo {site.guarantee.penalty} za każdy dzień opóźnienia</h2>
+      <p class="mt-5 text-lg text-white/75">Termin liczymy od skompletowania formalności i wpisujemy do umowy. Jeśli się spóźnimy, płacimy Ci za każdy dzień. Możemy sobie na to pozwolić, bo {site.stats.prefab} domu powstaje w hali, niezależnie od pogody.</p>
+      <a href="/wycena/" class="btn-primary mt-7">Sprawdź cenę swojego domu</a>
+    </div>
+    <ul class="grid gap-4">
+      {[
+        ['Stała cena w umowie', 'Wycenę dostajesz przed podpisaniem. Bez dopłat „bo materiały podrożały”.'],
+        [`${site.stats.warrantyYears} lat gwarancji na konstrukcję`, 'Certyfikowane drewno i łączniki, sprawdzona technologia szkieletowa.'],
+        ['Niezależny odbiór', 'Dom przekazujemy protokolarnie z udziałem zewnętrznej firmy odbiorowej.'],
+      ].map(([t, d]) => <li class="rounded-2xl border border-white/10 bg-white/5 p-5"><p class="font-extrabold text-sun">{t}</p><p class="mt-1 text-sm text-white/75">{d}</p></li>)}
+    </ul>
+  </div>
+</section>

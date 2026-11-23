@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import "@fontsource-variable/manrope";
+
+@theme {
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-navy: #0b162a;
+  --color-navy-800: #13233f;
+  --color-navy-700: #1c3157;
+  --color-sun: #fdc231;
+  --color-sun-600: #e9a90c;
+  --color-sun-100: #fff4d6;
+  --color-ember: #e8502f;
+  --color-ember-600: #cf3f20;
+  --color-sand: #f6f3ee;
+  --color-ink: #1b2536;
+  --color-mute: #5d6878;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-white text-ink antialiased; font-family: var(--font-sans); }
+  h1, h2, h3 { @apply text-navy font-extrabold tracking-tight; text-wrap: balance; }
+  p { text-wrap: pretty; }
+  :focus-visible { outline: 3px solid var(--color-sun-600); outline-offset: 2px; }
+}
+
+@layer components {
+  .wrap { @apply mx-auto w-full max-w-6xl px-4 sm:px-6; }
+  .section { @apply py-14 sm:py-20; }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-[0.14em] text-ember; }
+  .h2 { @apply mt-2 text-3xl sm:text-4xl; }
+  .lead { @apply mt-4 text-lg text-mute; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-bold transition cursor-pointer bg-ember text-white shadow-lg shadow-ember/25 hover:bg-ember-600; }
+  .btn-dark { @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-bold transition cursor-pointer bg-navy text-white hover:bg-navy-800; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-bold transition cursor-pointer border border-navy/15 bg-white text-navy hover:border-navy/40; }
+  .card { @apply rounded-2xl border border-navy/10 bg-white p-6 shadow-sm; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full bg-sun-100 px-3 py-1 text-xs font-bold text-navy; }
+  .field { @apply w-full rounded-xl border border-navy/20 bg-white px-4 py-3 text-base text-navy placeholder:text-mute/60 focus:border-navy; }
+  .quiz .opt { @apply w-full cursor-pointer rounded-xl border-2 border-navy/15 bg-white px-5 py-4 text-left text-base font-bold text-navy transition hover:border-ember; }
+  .quiz .opt[aria-pressed="true"] { @apply border-ember bg-sun-100; }
+  .tick { @apply flex gap-2.5; }
+  .tick::before { content: "✓"; @apply font-extrabold text-emerald-600; }
+}
